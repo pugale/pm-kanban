@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pm-kanban/progetto.schema.json",
+  "title": "PM-Kanban – file di progetto",
+  "description": "Struttura di un file <progetto>.json. Controlli aggiuntivi fatti dall'app (src/shared/validazioneFile.ts): id e codici univoci, fine dopo inizio, attività completata al 100%, partecipanti in minuscolo e non ripetuti, dipendenze verso attività esistenti, percorso degli allegati.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "progetto", "attivita", "dipendenze", "revisione", "aggiornatoIl", "aggiornatoDa"],
+  "properties": {
+    "schemaVersion": { "const": 1, "description": "Versione della struttura del file" },
+    "progetto": { "$ref": "#/$defs/progetto" },
+    "attivita": { "type": "array", "items": { "$ref": "#/$defs/attivita" } },
+    "dipendenze": { "type": "array", "items": { "$ref": "#/$defs/dipendenza" } },
+    "revisione": { "type": "integer", "minimum": 1, "description": "Numero di salvataggi del file" },
+    "aggiornatoIl": { "$ref": "#/$defs/dataUtc" },
+    "aggiornatoDa": { "$ref": "#/$defs/email" }
+  },
+  "$defs": {
+    "dataUtc": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+      "description": "Data e ora ISO in UTC con millisecondi, es. 2026-10-12T07:00:00.000Z"
+    },
+    "email": { "type": "string", "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$" },
+    "uuid": { "type": "string", "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" },
+    "idAttivita": { "type": "integer", "minimum": 1, "description": "ID numerico sequenziale di un'attività" },
+    "testoNonVuoto": { "type": "string", "pattern": "\\S" },
+    "elencoTag": { "type": "array", "items": { "$ref": "#/$defs/testoNonVuoto" } },
+
+    "progetto": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "nome", "prefissoCodice", "proprietario", "tag"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "nome": { "$ref": "#/$defs/testoNonVuoto" },
+        "cliente": { "$ref": "#/$defs/testoNonVuoto" },
+        "prefissoCodice": { "type": "string", "pattern": "^[A-Z0-9]{2,10}$", "description": "Prefisso dei codici attività, es. SARA" },
+        "proprietario": { "$ref": "#/$defs/email", "description": "Unico autore: gli altri aprono il progetto in sola lettura" },
+        "tag": { "$ref": "#/$defs/elencoTag" }
+      }
+    },
+
+    "attivita": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "codice", "titolo", "descrizione", "stato", "priorita", "dataOraInizio", "dataOraFine", "percentualeCompletamento",
+        "responsabile", "tag", "partecipanti", "invia_notifica", "canaleNotifica", "collegamenti", "allegati", "versione", "creataIl", "aggiornataIl"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/idAttivita" },
+        "codice": { "type": "string", "pattern": "^\\S(.*\\S)?$", "description": "Univoco nel progetto, maiuscolo, es. SARA-001" },
+        "titolo": { "$ref": "#/$defs/testoNonVuoto" },
+        "descrizione": { "type": "string" },
+        "stato": { "enum": ["IN_PREPARAZIONE", "DA_INIZIARE", "IN_CORSO", "SOSPESA", "COMPLETATA", "ANNULLATA"] },
+        "priorita": { "enum": ["BASSA", "MEDIA", "ALTA", "CRITICA"] },
+        "dataOraInizio": { "$ref": "#/$defs/dataUtc" },
+        "dataOraFine": { "$ref": "#/$defs/dataUtc" },
+        "percentualeCompletamento": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "responsabile": { "$ref": "#/$defs/email", "description": "Obbligatorio: riceve sempre la notifica" },
+        "tag": { "$ref": "#/$defs/elencoTag" },
+        "partecipanti": {
+          "type": "array",
+          "description": "Facoltativi: se presenti ricevono anche loro la notifica",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["email"],
+            "properties": {
+              "email": { "$ref": "#/$defs/email" },
+              "nome": { "$ref": "#/$defs/testoNonVuoto" }
+            }
+          }
+        },
+        "invia_notifica": { "enum": ["Si", "No", "Notifica_inviata"] },
+        "dataOraNotifica": { "$ref": "#/$defs/dataUtc", "description": "Data e ora di invio della notifica" },
+        "canaleNotifica": { "enum": ["TEAMS", "EMAIL", "ENTRAMBI"] },
+        "collegamenti": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tipo", "titolo", "url"],
+            "properties": {
+              "tipo": { "enum": ["SHAREPOINT", "TEAMS", "JIRA", "DEVOPS", "PLANNER", "ALTRO"] },
+              "titolo": { "$ref": "#/$defs/testoNonVuoto" },
+              "url": { "type": "string", "pattern": "^https?://\\S+$" }
+            }
+          }
+        },
+        "allegati": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "nome", "percorsoRelativo", "aggiuntoIl"],
+            "properties": {
+              "id": { "$ref": "#/$defs/uuid" },
+              "nome": { "$ref": "#/$defs/testoNonVuoto" },
+              "percorsoRelativo": { "type": "string", "pattern": "^allegati/[^/]+/[^/]+/[^/]+$", "description": "allegati/<idProgetto>/<idAttività>/<nome file>" },
+              "aggiuntoIl": { "$ref": "#/$defs/dataUtc" }
+            }
+          }
+        },
+        "versione": { "type": "integer", "minimum": 1, "description": "Cresce a ogni modifica dell'utente: serve a scoprire modifiche fatte nel frattempo" },
+        "creataIl": { "$ref": "#/$defs/dataUtc" },
+        "aggiornataIl": { "$ref": "#/$defs/dataUtc" },
+        "aggiornataDa": { "$ref": "#/$defs/email" }
+      },
+      "if": { "properties": { "invia_notifica": { "enum": ["Si", "Notifica_inviata"] } } },
+      "then": { "required": ["dataOraNotifica"] }
+    },
+
+    "dipendenza": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "origineId", "destinazioneId", "tipo"],
+      "properties": {
+        "id": { "$ref": "#/$defs/uuid" },
+        "origineId": { "$ref": "#/$defs/idAttivita", "description": "Attività predecessore" },
+        "destinazioneId": { "$ref": "#/$defs/idAttivita", "description": "Attività successore" },
+        "tipo": { "enum": ["FS", "SS", "FF", "SF"], "description": "Fine→Inizio, Inizio→Inizio, Fine→Fine, Inizio→Fine" }
+      }
+    }
+  }
+}

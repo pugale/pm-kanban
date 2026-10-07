@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "progetto": {
+    "id": "6f1c2b7e-3a44-4d1f-9a0b-2f7c1e5d9a10",
+    "nome": "SARA Bologna",
+    "cliente": "Comune di Bologna",
+    "prefissoCodice": "SARA",
+    "proprietario": "nome.cognome@azienda.it",
+    "tag": ["SARA", "Bologna"]
+  },
+  "attivita": [
+    {
+      "id": "b2d4f6a8-1c3e-4a5b-8d7f-0e9c1a2b3c4d",
+      "codice": "SARA-001",
+      "titolo": "Analisi requisiti CUDE",
+      "descrizione": "Analisi dei requisiti per l'integrazione con CUDE nazionale",
+      "stato": "DA_INIZIARE",
+      "priorita": "ALTA",
+      "dataOraInizio": "2026-10-12T07:00:00.000Z",
+      "dataOraFine": "2026-10-12T10:00:00.000Z",
+      "percentualeCompletamento": 0,
+      "responsabile": "nome.cognome@azienda.it",
+      "tag": ["CUDE"],
+      "partecipanti": [],
+      "invia_notifica": "Si",
+      "dataOraNotifica": "2026-10-12T06:45:00.000Z",
+      "canaleNotifica": "TEAMS",
+      "collegamenti": [
+        { "tipo": "JIRA", "titolo": "Ticket analisi", "url": "https://jira.esempio.it/browse/SARA-123" }
+      ],
+      "allegati": [],
+      "versione": 1,
+      "creataIl": "2026-10-06T13:30:00.000Z",
+      "aggiornataIl": "2026-10-06T13:30:00.000Z",
+      "aggiornataDa": "nome.cognome@azienda.it"
+    }
+  ],
+  "dipendenze": [],
+  "revisione": 1,
+  "aggiornatoIl": "2026-10-06T13:30:00.000Z",
+  "aggiornatoDa": "nome.cognome@azienda.it"
+}

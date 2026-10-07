@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manuale PM-Kanban</title>
+    <style>
+      :root {
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --primary: #2f6fed;
+        --primary-dark: #1f4fc1;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dfe7f5;
+        --accent: #edf3ff;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+      }
+
+      nav {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1rem 1.25rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+      }
+
+      nav a {
+        text-decoration: none;
+        color: var(--text);
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        transition: 0.2s ease;
+        font-weight: 600;
+      }
+
+      nav a:hover {
+        background: var(--accent);
+        color: var(--primary-dark);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 0 1.25rem 3rem;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(31, 79, 193, 0.04);
+        padding: 1.5rem 1.6rem;
+        margin-bottom: 1.25rem;
+      }
+
+      h1, h2, h3 {
+        margin-top: 0;
+        color: var(--primary-dark);
+      }
+
+      ul {
+        padding-left: 1.25rem;
+      }
+
+      .author-box {
+        background: linear-gradient(135deg, #f3f7ff, #eef5ff);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.2rem;
+      }
+
+      .badge {
+        display: inline-block;
+        background: var(--primary);
+        color: white;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.3rem 0.7rem;
+        font-size: 0.8rem;
+      }
+
+      code {
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 0.15rem 0.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <nav aria-label="Menu principale">
+        <a href="#home">Home</a>
+        <a href="#funzionalita">Funzionalità</a>
+        <a href="#autore">Autore</a>
+        <a href="#manuale">?</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section id="home" class="card">
+        <span class="badge">Manuale</span>
+        <h1>PM-Kanban</h1>
+        <p>
+          Questo manuale descrive le principali funzionalità dell'applicazione PM-Kanban,
+          con un focus su gestione progetti, attività, notifiche e flussi di lavoro.
+        </p>
+      </section>
+
+      <section id="funzionalita" class="card">
+        <h2>Funzionalità principali</h2>
+        <ul>
+          <li>Gestione di più progetti e clienti.</li>
+          <li>Creazione, modifica e eliminazione di attività.</li>
+          <li>Visualizzazione Kanban, Gantt, Calendario, Agenda e Dashboard.</li>
+          <li>Assegnazione di responsabile, partecipanti e tag.</li>
+          <li>Notifiche per data di inizio e avanzamento.</li>
+          <li>Collegamenti e allegati alle attività.</li>
+        </ul>
+      </section>
+
+      <section id="autore" class="card">
+        <h2>Autore</h2>
+        <div class="author-box">
+          <p><strong>Nome:</strong> Cogne</p>
+          <p><strong>Email:</strong> cogne@esempio.it</p>
+        </div>
+      </section>
+
+      <section id="manuale" class="card">
+        <h2>Sezione ? - Manuale HTML</h2>
+        <p>
+          Questa è la sezione dedicata al manuale HTML dell'applicazione. Può essere ampliata con
+          istruzioni specifiche per l'uso, esempi pratici e riferimenti alle procedure aziendali.
+        </p>
+
+        <h3>Istruzioni rapide</h3>
+        <ol>
+          <li>Aprire il progetto.</li>
+          <li>Creare un nuovo progetto dal menù principale.</li>
+          <li>Inserire le attività con titolo, data di inizio e responsabile.</li>
+          <li>Monitorare lo stato tramite le diverse viste.</li>
+          <li>Usare le dipendenze e le notifiche per coordinare i lavori.</li>
+        </ol>
+
+        <h3>Note utili</h3>
+        <p>
+          Gli ID delle attività sono numerici e sequenziali; i codici vengono generati automaticamente
+          in base al prefisso del progetto, ad esempio <code>SARA-001</code>.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

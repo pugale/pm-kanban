@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self'" />
+    <title>PM-Kanban</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; user-select: none; }
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: linear-gradient(160deg, #1678d6 0%, #0a50a0 100%);
+        color: #fff;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+        border-radius: 12px;
+        -webkit-app-region: drag;
+      }
+      img { width: 112px; height: 112px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.3)); animation: entra .6s ease-out; }
+      h1 { margin: 0; font-size: 32px; font-weight: 700; letter-spacing: .5px; }
+      .sotto { font-size: 13px; opacity: .85; margin-top: -8px; }
+      .barra { width: 220px; height: 4px; background: rgba(255,255,255,.25); border-radius: 2px; overflow: hidden; margin-top: 10px; }
+      .barra div { width: 40%; height: 100%; background: #fff; border-radius: 2px; animation: scorre 1.2s ease-in-out infinite; }
+      .stato { font-size: 12px; opacity: .8; }
+      .versione { position: absolute; bottom: 10px; right: 14px; font-size: 11px; opacity: .6; }
+      @keyframes scorre { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+      @keyframes entra { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+  </head>
+  <body>
+    <img src="icon.png" alt="" />
+    <h1>PM-Kanban</h1>
+    <div class="sotto">Kanban · Gantt · Calendario · Agenda · Dashboard</div>
+    <div class="barra"><div></div></div>
+    <div class="stato">Avvio in corso…</div>
+    <div class="versione" id="versione"></div>
+    <script>
+      const v = new URLSearchParams(location.search).get("v");
+      if (v) document.getElementById("versione").textContent = "versione " + v;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pm-kanban/registro-notifiche.schema.json",
+  "title": "PM-Kanban – registro delle notifiche inviate (_notifiche-inviate.json)",
+  "description": "Scritto solo dal flusso Power Automate. La chiave è idProgetto|idAttività|dataOraNotifica|canaleNotifica.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["inviate"],
+  "properties": {
+    "inviate": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["chiave", "inviataIl"],
+        "properties": {
+          "chiave": { "type": "string", "pattern": "^[^|]+\\|[^|]+\\|[^|]+\\|(TEAMS|EMAIL|ENTRAMBI)$" },
+          "inviataIl": { "type": "string", "description": "Data e ora di invio (utcNow() di Power Automate)" }
+        }
+      }
+    }
+  }
+}
