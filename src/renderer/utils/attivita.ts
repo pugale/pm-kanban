@@ -1,6 +1,7 @@
 // Etichette, colori e regole di visualizzazione delle attività
 
 import type { Attivita, CanaleNotifica, InviaNotifica, Priorita, StatoAttivita, TipoCollegamento, TipoDipendenza } from "../../shared/types";
+import { separaEmail } from "../../shared/validazioneFile";
 
 /** Nomi delle colonne della Kanban */
 export const COLONNE: Record<StatoAttivita, string> = {
@@ -95,7 +96,7 @@ export function corrispondeRicerca(a: Attivita, testo: string): boolean {
 export const eMia = (a: Attivita, email?: string) => {
   const e = email?.toLowerCase();
   if (!e) return false;
-  if (a.responsabile && a.responsabile.toLowerCase() === e) return true;
+  if (separaEmail(a.responsabile).includes(e)) return true;
   for (const p of a.partecipanti) {
     if (p.email.toLowerCase() === e) return true;
   }

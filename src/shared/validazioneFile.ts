@@ -15,6 +15,11 @@ import {
 } from "./types";
 
 export const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const separaEmail = (testo: string) =>
+  testo
+    .split(";")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
 /** Formato prodotto da Date.toISOString(): sempre UTC con millisecondi */
 export const RE_DATA_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 export const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -124,7 +129,16 @@ export function erroriFileProgetto(d: unknown): string[] {
       c.errore(`${pa}.dataOraFine`, "precede la data di inizio");
     c.intero(a.percentualeCompletamento, `${pa}.percentualeCompletamento`, 0, 100);
     if (a.stato === "COMPLETATA" && a.percentualeCompletamento !== 100) c.errore(`${pa}.percentualeCompletamento`, "un'attività completata deve essere al 100%");
-    c.testo(a.responsabile, `${pa}.responsabile`, { re: RE_EMAIL });
+    const responsabili = separaEmail(typeof a.responsabile === "string" ? a.responsabile : "");
+    if (typeof a.responsabile !== "string" || !responsabili.length) c.errore(`${pa}.responsabile`, "deve contenere almeno un'email");
+    else {
+      const responsabiliUnici = new Set<string>();
+      for (const email of responsabili) {
+        if (!RE_EMAIL.test(email)) c.errore(`${pa}.responsabile`, `email non valida: ${email}`);
+        else if (responsabiliUnici.has(email)) c.errore(`${pa}.responsabile`, `email ripetuta: ${email}`);
+        responsabiliUnici.add(email);
+      }
+    }
     c.elencoTesti(a.tag, `${pa}.tag`);
 
     const email = new Set<string>();

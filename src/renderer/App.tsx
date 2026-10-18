@@ -1,6 +1,6 @@
 // Finestra principale: scelta progetto, barra delle viste, ricerca e gestione degli errori
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Attivita, DatiAttivita, DatiProgetto, ElencoProgetti, Impostazioni as TipoImpostazioni, Risultato } from "../shared/types";
 import ModuloAttivita from "./components/ModuloAttivita";
 import ModuloProgetto from "./components/ModuloProgetto";
@@ -34,6 +34,7 @@ export default function App() {
   const [progettoId, setProgettoId] = useState<string | null>(() => localStorage.getItem(CHIAVE_PROGETTO));
   const [dati, setDati] = useState<DatiProgetto | null>(null);
   const [vista, setVista] = useState<Vista>(() => (localStorage.getItem(CHIAVE_VISTA) as Vista) || "kanban");
+  const vistaPrecedente = useRef<Vista>(vista === "impostazioni" ? "kanban" : vista);
   const [ricerca, setRicerca] = useState("");
   const [modulo, setModulo] = useState<StatoModulo>(null);
   const [nuovoProgetto, setNuovoProgetto] = useState(false);
@@ -82,7 +83,10 @@ export default function App() {
   }, [progettoId, caricaProgetto]);
 
   useEffect(() => {
-    if (vista !== "impostazioni") localStorage.setItem(CHIAVE_VISTA, vista);
+    if (vista !== "impostazioni") {
+      vistaPrecedente.current = vista;
+      localStorage.setItem(CHIAVE_VISTA, vista);
+    }
   }, [vista]);
 
   // Modifiche arrivate da OneDrive (altri PC) o notifiche segnate come inviate
@@ -191,6 +195,7 @@ export default function App() {
       return (
         <Impostazioni
           impostazioni={impostazioni}
+          onChiudi={() => setVista(vistaPrecedente.current)}
           onCambiate={(i) => {
             setImpostazioni(i);
             if (i.cartellaDati && i.emailUtente && vista === "impostazioni" && !configurata) setVista("kanban");

@@ -23,7 +23,7 @@ import {
   type StatoAttivita,
   type TipoDipendenza,
 } from "../../shared/types";
-import { RE_EMAIL, RE_URL } from "../../shared/validazioneFile";
+import { RE_EMAIL, RE_URL, separaEmail } from "../../shared/validazioneFile";
 import { CARTELLA_ALLEGATI, cartellaDati } from "./impostazioni";
 import { caricaProgetto, modificaProgetto } from "./progettoStore";
 
@@ -54,7 +54,7 @@ function normalizza(d: DatiAttivita): DatiNormalizzati {
     dataOraInizio: inUtc(d.dataOraInizio, "Data e ora di inizio"),
     dataOraFine: inUtc(d.dataOraFine, "Data e ora di fine"),
     percentualeCompletamento: Math.round(Number(d.percentualeCompletamento) || 0),
-    responsabile: (d.responsabile ?? "").trim().toLowerCase(),
+    responsabile: [...new Set(separaEmail(d.responsabile ?? ""))].join(";"),
     tag: [...new Set((d.tag ?? []).map((t) => t.trim()).filter(Boolean))],
     partecipanti: (d.partecipanti ?? []).map((p) => ({ email: p.email.trim().toLowerCase(), nome: p.nome?.trim() || undefined })),
     dataOraNotifica,
@@ -96,8 +96,11 @@ export function validaAttivita(a: DatiNormalizzati, tutte: Attivita[], idEscluso
   if (a.titolo.includes('"')) errori.push('Il titolo non può contenere virgolette doppie (") perché rompono la notifica Teams.');
 
   // Responsabile obbligatorio: è un'email perché riceve le notifiche
-  if (!a.responsabile) errori.push("Il responsabile è obbligatorio.");
-  else if (!RE_EMAIL.test(a.responsabile)) errori.push(`Il responsabile deve essere un'email valida: ${a.responsabile}`);
+  const responsabili = separaEmail(a.responsabile);
+  if (!responsabili.length) errori.push("Indica almeno un'email come responsabile.");
+  for (const email of responsabili) {
+    if (!RE_EMAIL.test(email)) errori.push(`Email del responsabile non valida: ${email}`);
+  }
 
   if (!STATI.includes(a.stato)) errori.push("Stato non valido.");
   if (!PRIORITA.includes(a.priorita)) errori.push("Priorità non valida.");
@@ -241,7 +244,7 @@ export function impostaInviaNotifica(progettoId: string, id: IdAttivita, valore:
     if (valore === "Si") {
       if (!a.dataOraNotifica || new Date(a.dataOraNotifica).getTime() < Date.now())
         throw new ErroreApp("VALIDAZIONE", `Apri l'attività ${a.codice} e indica una data e ora di invio futura per la notifica.`);
-      if (!a.responsabile) throw new ErroreApp("VALIDAZIONE", "Indica prima il responsabile: è lui a ricevere le notifiche.");
+      if (!separaEmail(a.responsabile).length) throw new ErroreApp("VALIDAZIONE", "Indica prima almeno un responsabile: riceve la notifica.");
     }
     a.invia_notifica = valore;
     tocca(a, utente);

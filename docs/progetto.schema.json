@@ -58,7 +58,11 @@
         "dataOraInizio": { "$ref": "#/$defs/dataUtc" },
         "dataOraFine": { "$ref": "#/$defs/dataUtc" },
         "percentualeCompletamento": { "type": "integer", "minimum": 0, "maximum": 100 },
-        "responsabile": { "$ref": "#/$defs/email", "description": "Obbligatorio: riceve sempre la notifica" },
+        "responsabile": {
+          "type": "string",
+          "pattern": "^[^\\s@;]+@[^\\s@;]+\\.[^\\s@;]+(?:;[^\\s@;]+@[^\\s@;]+\\.[^\\s@;]+)*$",
+          "description": "Obbligatorio: uno o più indirizzi email separati da punto e virgola; tutti ricevono la notifica"
+        },
         "tag": { "$ref": "#/$defs/elencoTag" },
         "partecipanti": {
           "type": "array",

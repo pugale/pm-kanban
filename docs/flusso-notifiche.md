@@ -129,7 +129,7 @@ and(
      - Da: `items('Per_ogni_attivita')?['partecipanti']`
      - Mappa (modalità testo): `item()?['email']`
   2. **Filtra matrice** → `Destinatari` (responsabile + partecipanti, senza doppioni né valori vuoti)
-     - Da: `union(createArray(items('Per_ogni_attivita')?['responsabile']), body('Email_partecipanti'))`
+     - Da: `union(split(items('Per_ogni_attivita')?['responsabile'], ';'), body('Email_partecipanti'))`
      - Riga: `not(empty(item()))` – è uguale a – `true`
   3. **Componi** → `Ora inizio`
      ```

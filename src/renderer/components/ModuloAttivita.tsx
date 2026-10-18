@@ -14,6 +14,7 @@ import {
   type InviaNotifica,
   type Progetto,
 } from "../../shared/types";
+import { separaEmail } from "../../shared/validazioneFile";
 import { ETICHETTE_CANALE, ETICHETTE_COLLEGAMENTO, ETICHETTE_INVIA_NOTIFICA, ETICHETTE_PRIORITA, ETICHETTE_STATO } from "../utils/attivita";
 import { MS_ORA, daInput, fmtDataOra, perInput, prossimaOraPiena } from "../utils/date";
 import Finestra from "./Finestra";
@@ -122,7 +123,7 @@ export default function ModuloAttivita({ progetto, attivita, preimpostato, solaL
       dataOraInizio: daInput(inizio),
       dataOraFine: daInput(fine),
       percentualeCompletamento: Number(percentuale),
-      responsabile,
+      responsabile: [...new Set(separaEmail(responsabile))].join(";"),
       tag: tag.split(",").map((t) => t.trim()).filter(Boolean),
       partecipanti: [...new Set(leggiEmail(partecipanti))].map((email) => ({ email, nome: nomiEsistenti.get(email) })),
       invia_notifica: inviaNotifica,
@@ -262,8 +263,8 @@ export default function ModuloAttivita({ progetto, attivita, preimpostato, solaL
 
         <div className="riga-modulo">
           <label className="campo">
-            Responsabile (email) *
-            <input type="email" value={responsabile} onChange={(e) => setResponsabile(e.target.value)} placeholder="nome.cognome@azienda.it" />
+            Responsabili (email separati da ;) *
+            <input type="text" value={responsabile} onChange={(e) => setResponsabile(e.target.value)} placeholder="nome.cognome@azienda.it; altro@azienda.it" />
           </label>
           <label className="campo">
             Tag (separati da virgola)
@@ -273,8 +274,8 @@ export default function ModuloAttivita({ progetto, attivita, preimpostato, solaL
 
         <div className="riga-modulo">
           <label className="campo">
-            Email dei partecipanti (facoltative, una per riga)
-            <textarea rows={4} value={partecipanti} onChange={(e) => setPartecipanti(e.target.value)} placeholder="nome.cognome@azienda.it" />
+            Partecipanti (email facoltative, separate da ;)
+            <textarea rows={4} value={partecipanti} onChange={(e) => setPartecipanti(e.target.value)} placeholder="nome.cognome@azienda.it; altro@azienda.it" />
           </label>
 
           <label className="campo">

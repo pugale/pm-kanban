@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { PRIORITA, STATI, type Attivita } from "../../shared/types";
+import { separaEmail } from "../../shared/validazioneFile";
 import type { AzioniVista } from "../tipiVista";
 import { COLORI_PRIORITA, COLORI_STATO, ETICHETTE_PRIORITA, ETICHETTE_STATO, ICONE_STATO, eChiusa, eInRitardo } from "../utils/attivita";
 import { aggiungiGiorni, fmtDataOra, inizioGiorno, inizioSettimana } from "../utils/date";
@@ -78,7 +79,9 @@ export default function Dashboard({ attivita, azioni }: Props) {
       if (!eChiusa(a)) {
         aperte.push(a);
         perPriorita.set(priorita, (perPriorita.get(priorita) ?? 0) + 1);
-        if (a.responsabile) perResponsabile.set(a.responsabile, (perResponsabile.get(a.responsabile) ?? 0) + 1);
+        for (const responsabile of separaEmail(a.responsabile)) {
+          perResponsabile.set(responsabile, (perResponsabile.get(responsabile) ?? 0) + 1);
+        }
 
         const fine = new Date(a.dataOraFine).getTime();
         if (fine >= oggi.getTime() && fine < domani.getTime()) oggiScadenza.push(a);

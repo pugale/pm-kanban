@@ -3,11 +3,12 @@ import type { Impostazioni as TipoImpostazioni } from "../../shared/types";
 
 interface Props {
   impostazioni: TipoImpostazioni;
+  onChiudi(): void;
   onCambiate(i: TipoImpostazioni): void;
   onCartellaCambiata(): void;
 }
 
-export default function Impostazioni({ impostazioni, onCambiate, onCartellaCambiata }: Props) {
+export default function Impostazioni({ impostazioni, onChiudi, onCambiate, onCartellaCambiata }: Props) {
   const [email, setEmail] = useState(impostazioni.emailUtente ?? "");
   const [nome, setNome] = useState(impostazioni.nomeUtente ?? "");
   const [messaggio, setMessaggio] = useState<{ tipo: "info" | "errore"; testo: string } | null>(null);
@@ -74,7 +75,6 @@ export default function Impostazioni({ impostazioni, onCambiate, onCartellaCambi
           <small className="nota">
             L'email identifica il proprietario dei progetti (solo lui può modificarli) ed è proposta come responsabile delle nuove attività.
           </small>
-          <div><button className="btn primario" onClick={salva}>Salva</button></div>
         </div>
       </div>
 
@@ -95,6 +95,11 @@ export default function Impostazioni({ impostazioni, onCambiate, onCartellaCambi
           e ai partecipanti. L'app controlla da sola ogni 5 minuti il registro delle notifiche inviate e aggiorna lo stato delle attività.
         </p>
         <div><button className="btn" onClick={controllaNotifiche}>🔄 Controlla adesso</button></div>
+      </div>
+
+      <div className="impostazioni-piede">
+        <button className="btn primario" onClick={salva}>Salva</button>
+        <button className="btn" onClick={onChiudi}>Chiudi</button>
       </div>
     </div>
   );
