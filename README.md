@@ -36,7 +36,7 @@ Altri comandi:
 |---|---|
 | `npm start` | Compila tutto e avvia l'app come in produzione |
 | `npm run typecheck` | Controlla gli errori di TypeScript senza avviare |
-| `npm run dist` | Crea l'eseguibile portatile Windows `PM-Kanban` (con icona) nella cartella `release` |
+| `npm run dist` | Crea l'eseguibile portatile e il setup Windows nella cartella `release` |
 
 Debug: in VS Code premi **F5** ("Avvia PM-Kanban") per mettere punti di interruzione nel processo principale.
 

@@ -329,14 +329,23 @@ export async function eliminaAttivita(progettoId: string, id: IdAttivita, versio
 
 /** true se partendo da "da" e seguendo le frecce si arriva ad "a" */
 function raggiungibile(dipendenze: Dipendenza[], da: IdAttivita, a: IdAttivita): boolean {
-  const visitati = new Set<IdAttivita>();
+  const adiacenze = new Map<IdAttivita, IdAttivita[]>();
+  for (const d of dipendenze) {
+    const destinazioni = adiacenze.get(d.origineId) ?? [];
+    destinazioni.push(d.destinazioneId);
+    adiacenze.set(d.origineId, destinazioni);
+  }
+
+  const visitati = new Set<IdAttivita>([da]);
   const coda: IdAttivita[] = [da];
-  while (coda.length) {
-    const n = coda.shift()!;
+  for (let indice = 0; indice < coda.length; indice++) {
+    const n = coda[indice];
     if (n === a) return true;
-    if (visitati.has(n)) continue;
-    visitati.add(n);
-    for (const d of dipendenze) if (d.origineId === n) coda.push(d.destinazioneId);
+    for (const destinazione of adiacenze.get(n) ?? []) {
+      if (visitati.has(destinazione)) continue;
+      visitati.add(destinazione);
+      coda.push(destinazione);
+    }
   }
   return false;
 }
