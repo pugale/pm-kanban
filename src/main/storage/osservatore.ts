@@ -3,6 +3,7 @@
 
 import { BrowserWindow } from "electron";
 import { watch, type FSWatcher } from "fs";
+import path from "path";
 import { NOME_REGISTRO, cartellaDati } from "./impostazioni";
 import { aggiornaStatoNotifiche } from "./notificheService";
 import { eFileProgetto, eScritturaPropria, invalidaIndice } from "./progettoStore";
@@ -48,7 +49,7 @@ export async function avviaOsservatore(): Promise<void> {
       return;
     }
 
-    if (!eFileProgetto(nome) || eScritturaPropria(nome)) return;
+    if (!eFileProgetto(nome) || eScritturaPropria(path.join(cartella, nome))) return;
     cambiati.add(nome);
     clearTimeout(timerProgetti);
     // OneDrive genera più eventi di seguito: si aspetta che finisca

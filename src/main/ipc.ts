@@ -1,6 +1,7 @@
 // Canali tra interfaccia React e processo principale
 
-import { BrowserWindow, dialog, ipcMain, type OpenDialogOptions } from "electron";
+import { BrowserWindow, dialog, ipcMain, type OpenDialogOptions, type SaveDialogOptions } from "electron";
+import path from "path";
 import type { DatiNuovoProgetto } from "../shared/api";
 import { ErroreApp, type CodiceErrore, type DatiAttivita, type IdAttivita, type Impostazioni, type Risultato, type StatoAttivita, type TipoDipendenza } from "../shared/types";
 import * as att from "./storage/attivitaService";
@@ -39,6 +40,30 @@ export function registraIpc(): void {
   // Progetti
   gestisci("progetti:elenco", () => store.elencoProgetti());
   gestisci("progetti:crea", (input: DatiNuovoProgetto) => store.creaProgetto(input));
+  gestisci("progetti:apriFile", async () => {
+    const finestra = BrowserWindow.getFocusedWindow();
+    const opzioni: OpenDialogOptions = {
+      title: "Apri un file progetto JSON",
+      properties: ["openFile"],
+      filters: [{ name: "Progetti PM-Kanban", extensions: ["json"] }],
+    };
+    const r = finestra ? await dialog.showOpenDialog(finestra, opzioni) : await dialog.showOpenDialog(opzioni);
+    if (r.canceled || !r.filePaths[0]) return null;
+    return store.apriProgettoDaFile(r.filePaths[0]);
+  });
+  gestisci("progetti:esporta", async (progettoId: string) => {
+    const finestra = BrowserWindow.getFocusedWindow();
+    const opzioni: SaveDialogOptions = {
+      title: "Salva una copia del progetto",
+      defaultPath: "Progetto.json",
+      filters: [{ name: "Progetti PM-Kanban", extensions: ["json"] }],
+    };
+    const r = finestra ? await dialog.showSaveDialog(finestra, opzioni) : await dialog.showSaveDialog(opzioni);
+    if (r.canceled || !r.filePath) return null;
+    const destinazione = path.extname(r.filePath) ? r.filePath : `${r.filePath}.json`;
+    await store.esportaProgetto(progettoId, destinazione);
+    return path.basename(destinazione);
+  });
 
   // Attività
   gestisci("attivita:elenco", (progettoId: string) => att.elencoAttivita(progettoId));

@@ -39,6 +39,16 @@ export default function App() {
   const [modulo, setModulo] = useState<StatoModulo>(null);
   const [nuovoProgetto, setNuovoProgetto] = useState(false);
   const [messaggio, setMessaggio] = useState<Messaggio>(null);
+  const menuProgettoRef = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    const chiudiSeEsterno = (event: PointerEvent) => {
+      const menu = menuProgettoRef.current;
+      if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+    };
+    document.addEventListener("pointerdown", chiudiSeEsterno);
+    return () => document.removeEventListener("pointerdown", chiudiSeEsterno);
+  }, []);
 
   const configurata = !!impostazioni?.cartellaDati && !!impostazioni?.emailUtente;
   const progettiDisponibili = useMemo(() => elenco?.progetti ?? [], [elenco]);
@@ -174,6 +184,28 @@ export default function App() {
   const attivitaFiltrate = useMemo(() => (dati?.attivita ?? []).filter((a) => corrispondeRicerca(a, ricerca)), [dati, ricerca]);
   const solaLettura = dati?.solaLettura ?? true;
 
+  const apriProgettoDaFile = async () => {
+    const r = await window.pm.apriProgettoDaFile();
+    if (!r.ok) return setMessaggio({ tipo: "errore", testo: r.messaggio });
+    if (!r.dati) return;
+    const progettoAperto = r.dati;
+    setElenco((attuale) => ({
+      progetti: [progettoAperto.info, ...(attuale?.progetti ?? []).filter((p) => p.id !== progettoAperto.info.id)],
+      copieInConflitto: attuale?.copieInConflitto ?? [],
+      fileNonLeggibili: attuale?.fileNonLeggibili ?? [],
+    }));
+    setDati(progettoAperto.dati);
+    setProgettoId(progettoAperto.info.id);
+    setMessaggio({ tipo: "info", testo: `Progetto "${progettoAperto.info.nome}" aperto da ${progettoAperto.info.nomeFile}.` });
+  };
+
+  const esportaProgetto = async () => {
+    if (!progettoId) return;
+    const r = await window.pm.esportaProgetto(progettoId);
+    if (!r.ok) return setMessaggio({ tipo: "errore", testo: r.messaggio });
+    if (r.dati) setMessaggio({ tipo: "info", testo: `Copia del progetto salvata come "${r.dati}".` });
+  };
+
   // Scorciatoia: Ctrl+N nuova attività
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
@@ -235,7 +267,23 @@ export default function App() {
       <header className="testata">
         {configurata && (
           <>
-            <label className="etichetta-progetto" htmlFor="scelta-progetto">Progetto:</label>
+            <details
+              className="menu-progetto"
+              ref={menuProgettoRef}
+              onBlur={(event) => {
+                const destinazione = event.relatedTarget;
+                if (!(destinazione instanceof Node) || !event.currentTarget.contains(destinazione)) {
+                  event.currentTarget.open = false;
+                }
+              }}
+            >
+              <summary className="btn">Progetto ▾</summary>
+              <div className="menu-progetto-voci">
+                <button onClick={() => { menuProgettoRef.current?.removeAttribute("open"); setNuovoProgetto(true); }}>+ Progetto</button>
+                <button onClick={() => { menuProgettoRef.current?.removeAttribute("open"); void apriProgettoDaFile(); }}>Apri Progetto…</button>
+                <button disabled={!dati} onClick={() => { menuProgettoRef.current?.removeAttribute("open"); void esportaProgetto(); }}>Salva Copia…</button>
+              </div>
+            </details>
             <select
               id="scelta-progetto"
               className="scelta-progetto"
@@ -250,7 +298,6 @@ export default function App() {
                 </option>
               ))}
             </select>
-            <button className="btn" onClick={() => setNuovoProgetto(true)} title="Nuovo progetto">+ Progetto</button>
 
             <nav className="schede">
               {VISTE.map((v) => (

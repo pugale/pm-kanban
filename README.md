@@ -65,6 +65,11 @@ Barra in alto: **Progetto:** [scelta] · + Progetto · viste · ricerca · **+ N
 
 La **ricerca** in alto filtra tutte le viste (codice, titolo, descrizione, responsabile, tag, email).
 
+### Aprire e salvare file in altre cartelle
+
+- **Apri JSON…** permette di selezionare un progetto `.json` anche fuori dalla cartella dati configurata. Il file viene aperto dalla sua posizione originale: le modifiche successive vengono salvate lì automaticamente. Rimane disponibile nell'elenco dei progetti finché PM-Kanban resta aperto.
+- **Salva copia…** salva una copia aggiornata del progetto nella cartella scelta. La copia non sostituisce il file aperto né cambia la posizione in cui vengono salvate le modifiche future.
+
 ### Campi dell'attività
 
 | Campo | Obbligatorio | Note |

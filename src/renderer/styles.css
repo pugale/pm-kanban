@@ -71,6 +71,20 @@ code { background: #eef2f6; padding: 1px 5px; border-radius: 4px; }
 }
 .etichetta-progetto { font-weight: 700; color: var(--primario); font-size: 15px; }
 .scelta-progetto { min-width: 220px; max-width: 320px; font-weight: 600; }
+.menu-progetto { position: relative; }
+.menu-progetto summary { list-style: none; }
+.menu-progetto summary::-webkit-details-marker { display: none; }
+.menu-progetto-voci {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 20;
+  min-width: 180px; padding: 4px; background: var(--pannello);
+  border: 1px solid var(--bordo); border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, .14);
+}
+.menu-progetto-voci button {
+  display: block; width: 100%; padding: 8px 10px; border: 0; border-radius: 4px;
+  background: transparent; color: var(--testo); text-align: left; white-space: nowrap;
+}
+.menu-progetto-voci button:hover:not(:disabled) { background: #eef3f8; }
+.menu-progetto-voci button:disabled { color: var(--testo-tenue); cursor: not-allowed; }
 .schede { display: flex; gap: 2px; margin-left: 8px; }
 .scheda { border: none; background: transparent; padding: 7px 12px; border-radius: 6px; color: var(--testo-tenue); }
 .scheda:hover:not(:disabled) { background: #eef3f8; }

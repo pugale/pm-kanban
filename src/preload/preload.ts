@@ -12,6 +12,8 @@ const api: PmApi = {
 
   progetti: () => invoca("progetti:elenco"),
   creaProgetto: (input) => invoca("progetti:crea", input),
+  apriProgettoDaFile: () => invoca("progetti:apriFile"),
+  esportaProgetto: (progettoId) => invoca("progetti:esporta", progettoId),
 
   attivita: (progettoId) => invoca("attivita:elenco", progettoId),
   prossimoCodice: (progettoId) => invoca("attivita:prossimoCodice", progettoId),

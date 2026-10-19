@@ -3,7 +3,7 @@
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import { ErroreApp, VERSIONE_SCHEMA, type ElencoProgetti, type FileProgetto, type InfoProgetto, type Progetto } from "../../shared/types";
+import { ErroreApp, VERSIONE_SCHEMA, type DatiProgetto, type ElencoProgetti, type FileProgetto, type InfoProgetto, type Progetto } from "../../shared/types";
 import { RE_PREFISSO, erroriFileProgetto, verificaFileProgetto } from "../../shared/validazioneFile";
 import { cartellaDati, leggiImpostazioni } from "./impostazioni";
 
@@ -15,7 +15,7 @@ export const eFileProgetto = (nome: string) => nome.toLowerCase().endsWith(".jso
 // ---------- Scritture fatte dall'app (per non ricaricare a vuoto quando arriva l'evento del file) ----------
 
 const scrittureProprie = new Map<string, number>();
-export const eScritturaPropria = (nomeFile: string) => Date.now() - (scrittureProprie.get(nomeFile) ?? 0) < 3000;
+export const eScritturaPropria = (percorso: string) => Date.now() - (scrittureProprie.get(path.resolve(percorso)) ?? 0) < 3000;
 
 // ---------- Utilità sui file ----------
 
@@ -85,20 +85,22 @@ function formaCanonica(f: FileProgetto): FileProgetto {
  */
 async function scriviSuFile(percorso: string, dati: FileProgetto) {
   const nome = path.basename(percorso);
+  const chiaveScrittura = path.resolve(percorso);
   const testo = JSON.stringify(formaCanonica(dati), null, 2);
   const errori = erroriFileProgetto(JSON.parse(testo));
   if (errori.length) throw new ErroreApp("ERRORE", `Salvataggio annullato, i dati non rispettano la struttura del file:\n- ${errori.join("\n- ")}`);
 
   const tmp = path.join(path.dirname(percorso), `~$${nome}.tmp`);
   await fs.writeFile(tmp, testo, "utf8");
-  scrittureProprie.set(nome, Date.now());
+  scrittureProprie.set(chiaveScrittura, Date.now());
   await conRiprova(() => fs.rename(tmp, percorso));
-  scrittureProprie.set(nome, Date.now());
+  scrittureProprie.set(chiaveScrittura, Date.now());
 }
 
 // ---------- Indice progettoId → percorso ----------
 
 const indice = new Map<string, string>();
+const percorsiAperti = new Map<string, string>();
 export const invalidaIndice = () => indice.clear();
 
 async function percorsoDi(progettoId: string): Promise<string> {
@@ -132,17 +134,27 @@ export async function elencoProgetti(): Promise<ElencoProgetti> {
   const perId = new Map<string, { info: InfoProgetto; percorso: string }[]>();
   const fileNonLeggibili: ElencoProgetti["fileNonLeggibili"] = [];
 
-  for (const v of voci) {
-    if (!v.isFile() || !eFileProgetto(v.name)) continue;
-    const percorso = path.join(cartella, v.name);
+  const aggiungiFile = async (percorso: string, nome: string): Promise<boolean> => {
     try {
       const f = await leggiDaFile(percorso);
       const lista = perId.get(f.progetto.id) ?? [];
-      lista.push({ info: infoDa(f, v.name, eSolaLettura(f.progetto, emailUtente)), percorso });
+      lista.push({ info: infoDa(f, nome, eSolaLettura(f.progetto, emailUtente)), percorso });
       perId.set(f.progetto.id, lista);
+      return true;
     } catch (e) {
-      fileNonLeggibili.push({ file: v.name, messaggio: (e as Error).message });
+      fileNonLeggibili.push({ file: nome, messaggio: (e as Error).message });
+      return false;
     }
+  };
+
+  for (const v of voci) {
+    if (v.isFile() && eFileProgetto(v.name)) await aggiungiFile(path.join(cartella, v.name), v.name);
+  }
+
+  const percorsiCartella = new Set(voci.filter((v) => v.isFile() && eFileProgetto(v.name)).map((v) => path.resolve(cartella, v.name)));
+  for (const [id, percorso] of percorsiAperti) {
+    if (percorsiCartella.has(path.resolve(percorso))) continue;
+    if (!(await aggiungiFile(percorso, path.basename(percorso)))) percorsiAperti.delete(id);
   }
 
   indice.clear();
@@ -151,14 +163,35 @@ export async function elencoProgetti(): Promise<ElencoProgetti> {
 
   for (const [id, lista] of perId) {
     // Il file "originale" è quello col nome più corto: le copie di OneDrive aggiungono il nome del PC
+    const aperto = lista.find((x) => path.resolve(x.percorso) === path.resolve(percorsiAperti.get(id) ?? ""));
     lista.sort((a, b) => a.info.nomeFile.length - b.info.nomeFile.length);
-    indice.set(id, lista[0].percorso);
-    progetti.push(lista[0].info);
+    const principale = aperto ?? lista[0];
+    indice.set(id, principale.percorso);
+    progetti.push(principale.info);
     if (lista.length > 1) copieInConflitto.push({ progettoId: id, nome: lista[0].info.nome, file: lista.map((x) => x.info.nomeFile) });
   }
 
   progetti.sort((a, b) => a.nome.localeCompare(b.nome, "it"));
   return { progetti, copieInConflitto, fileNonLeggibili };
+}
+
+export async function apriProgettoDaFile(percorso: string): Promise<{ info: InfoProgetto; dati: DatiProgetto }> {
+  const file = path.resolve(percorso);
+  const f = await leggiDaFile(file);
+  const { emailUtente } = await leggiImpostazioni();
+  const solaLettura = eSolaLettura(f.progetto, emailUtente);
+  percorsiAperti.set(f.progetto.id, file);
+  indice.set(f.progetto.id, file);
+  return {
+    info: infoDa(f, path.basename(file), solaLettura),
+    dati: { progetto: f.progetto, attivita: f.attivita, dipendenze: f.dipendenze, solaLettura },
+  };
+}
+
+export async function esportaProgetto(progettoId: string, destinazione: string): Promise<void> {
+  const percorso = await percorsoDi(progettoId);
+  const dati = await leggiDaFile(percorso);
+  await scriviSuFile(path.resolve(destinazione), dati);
 }
 
 export async function caricaProgetto(progettoId: string): Promise<{ dati: FileProgetto; solaLettura: boolean }> {
