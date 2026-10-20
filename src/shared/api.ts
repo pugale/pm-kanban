@@ -26,6 +26,7 @@ export interface PmApi {
   // Progetti
   progetti(): Promise<Risultato<ElencoProgetti>>;
   creaProgetto(input: DatiNuovoProgetto): Promise<Risultato<InfoProgetto>>;
+  eliminaProgetto(progettoId: string): Promise<Risultato<void>>;
   apriProgettoDaFile(): Promise<Risultato<{ info: InfoProgetto; dati: DatiProgetto } | null>>;
   esportaProgetto(progettoId: string): Promise<Risultato<string | null>>;
 

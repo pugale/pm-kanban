@@ -89,6 +89,7 @@ export default function App() {
 
   useEffect(() => {
     if (progettoId) localStorage.setItem(CHIAVE_PROGETTO, progettoId);
+    else localStorage.removeItem(CHIAVE_PROGETTO);
     void caricaProgetto(progettoId);
   }, [progettoId, caricaProgetto]);
 
@@ -206,6 +207,21 @@ export default function App() {
     if (r.dati) setMessaggio({ tipo: "info", testo: `Copia del progetto salvata come "${r.dati}".` });
   };
 
+  const eliminaProgetto = async () => {
+    if (!progettoId || !dati || solaLettura) return;
+    const nome = dati.progetto.nome;
+    if (!window.confirm(`Eliminare definitivamente il progetto "${nome}"?\nVerranno eliminate anche tutte le attività e i relativi allegati.`)) return;
+
+    const r = await window.pm.eliminaProgetto(progettoId);
+    if (r.ok) {
+      setDati(null);
+      setMessaggio({ tipo: "info", testo: `Progetto "${nome}" eliminato.` });
+    } else {
+      setMessaggio({ tipo: "errore", testo: r.messaggio });
+    }
+    await caricaElenco();
+  };
+
   // Scorciatoia: Ctrl+N nuova attività
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
@@ -279,9 +295,15 @@ export default function App() {
             >
               <summary className="btn">Progetto ▾</summary>
               <div className="menu-progetto-voci">
-                <button onClick={() => { menuProgettoRef.current?.removeAttribute("open"); setNuovoProgetto(true); }}>+ Progetto</button>
-                <button onClick={() => { menuProgettoRef.current?.removeAttribute("open"); void apriProgettoDaFile(); }}>Apri Progetto…</button>
-                <button disabled={!dati} onClick={() => { menuProgettoRef.current?.removeAttribute("open"); void esportaProgetto(); }}>Salva Copia…</button>
+                <button onClick={() => { menuProgettoRef.current?.removeAttribute("open"); setNuovoProgetto(true); }}>Nuovo Progetto</button>
+                <button onClick={() => { menuProgettoRef.current?.removeAttribute("open"); void apriProgettoDaFile(); }}>Apri Progetto</button>
+                <button disabled={!dati} onClick={() => { menuProgettoRef.current?.removeAttribute("open"); void esportaProgetto(); }}>Salva una Copia</button>
+                <button
+                  className="pericolo"
+                  disabled={!dati || solaLettura}
+                  onClick={() => { menuProgettoRef.current?.removeAttribute("open"); void eliminaProgetto(); }}
+                >Elimina Progetto
+                </button>
               </div>
             </details>
             <select

@@ -84,6 +84,7 @@ code { background: #eef2f6; padding: 1px 5px; border-radius: 4px; }
   background: transparent; color: var(--testo); text-align: left; white-space: nowrap;
 }
 .menu-progetto-voci button:hover:not(:disabled) { background: #eef3f8; }
+.menu-progetto-voci button.pericolo { color: var(--pericolo); }
 .menu-progetto-voci button:disabled { color: var(--testo-tenue); cursor: not-allowed; }
 .schede { display: flex; gap: 2px; margin-left: 8px; }
 .scheda { border: none; background: transparent; padding: 7px 12px; border-radius: 6px; color: var(--testo-tenue); }

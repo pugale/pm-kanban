@@ -40,6 +40,7 @@ export function registraIpc(): void {
   // Progetti
   gestisci("progetti:elenco", () => store.elencoProgetti());
   gestisci("progetti:crea", (input: DatiNuovoProgetto) => store.creaProgetto(input));
+  gestisci("progetti:elimina", (progettoId: string) => store.eliminaProgetto(progettoId));
   gestisci("progetti:apriFile", async () => {
     const finestra = BrowserWindow.getFocusedWindow();
     const opzioni: OpenDialogOptions = {

@@ -53,7 +53,9 @@ Debug: in VS Code premi **F5** ("Avvia PM-Kanban") per mettere punti di interruz
 
 ## 4. Come si usa
 
-Barra in alto: **Progetto:** [scelta] · + Progetto · viste · ricerca · **+ Nuova attività** · ⚙️ Impostazioni
+Barra in alto: **Progetto:** [scelta] · Nuovo/Apri/Salva copia/Elimina progetto · viste · ricerca · **+ Nuova attività** · ⚙️ Impostazioni
+
+Dal menu **Progetto → Elimina Progetto** puoi eliminare definitivamente il progetto visualizzato e i relativi allegati. L'operazione richiede conferma ed è disponibile solo per il proprietario del progetto.
 
 | Vista | Cosa puoi fare |
 |---|---|

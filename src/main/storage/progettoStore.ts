@@ -5,7 +5,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { ErroreApp, VERSIONE_SCHEMA, type DatiProgetto, type ElencoProgetti, type FileProgetto, type InfoProgetto, type Progetto } from "../../shared/types";
 import { RE_PREFISSO, erroriFileProgetto, verificaFileProgetto } from "../../shared/validazioneFile";
-import { cartellaDati, leggiImpostazioni } from "./impostazioni";
+import { CARTELLA_ALLEGATI, cartellaDati, leggiImpostazioni } from "./impostazioni";
 
 const attesa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -215,6 +215,28 @@ function inSequenza<T>(chiave: string, fn: () => Promise<T>): Promise<T> {
   const prossimo = (code.get(chiave) ?? Promise.resolve()).catch(() => undefined).then(fn);
   code.set(chiave, prossimo.catch(() => undefined));
   return prossimo;
+}
+
+export async function eliminaProgetto(progettoId: string): Promise<void> {
+  const percorso = await percorsoDi(progettoId);
+  await inSequenza(percorso, async () => {
+    const { emailUtente } = await leggiImpostazioni();
+    const dati = await leggiDaFile(percorso);
+    if (dati.progetto.id !== progettoId)
+      throw new ErroreApp("NON_TROVATO", "Il progetto selezionato non corrisponde più al file presente.");
+    if (!emailUtente || eSolaLettura(dati.progetto, emailUtente))
+      throw new ErroreApp("SOLA_LETTURA", `Il progetto è gestito da ${dati.progetto.proprietario}: puoi solo consultarlo.`);
+
+    const cartella = await cartellaDati();
+    await conRiprova(() => fs.unlink(percorso));
+    indice.delete(progettoId);
+    percorsiAperti.delete(progettoId);
+    try {
+      await conRiprova(() => fs.rm(path.join(cartella, CARTELLA_ALLEGATI, progettoId), { recursive: true, force: true }));
+    } catch (e) {
+      throw new ErroreApp("ERRORE", `Il progetto è stato eliminato, ma non è stato possibile eliminare i suoi allegati: ${(e as Error).message}`);
+    }
+  });
 }
 
 /**
