@@ -4,9 +4,6 @@
   "version": "1.0.0",
   "description": "PM-Kanban: gestione attività di progetto con Kanban, Gantt, Calendario, Agenda e Dashboard. Dati su cartella SharePoint sincronizzata.",
   "private": true,
-  "engines": {
-    "node": ">=26.12.1"
-  },
   "main": "dist-electron/main/main.js",
   "scripts": {
     "dev": "npm run build:main && concurrently -k -n VITE,MAIN,APP -c cyan,yellow,green \"vite\" \"tsc -p tsconfig.main.json -w --preserveWatchOutput\" \"wait-on tcp:127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
@@ -14,7 +11,6 @@
     "build:renderer": "vite build",
     "build": "npm run build:main && npm run build:renderer",
     "start": "npm run build && electron .",
-    "test": "vitest run",
     "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.json --noEmit",
     "dist": "npm run build && electron-builder --win"
   },
@@ -25,11 +21,10 @@
     "@vitejs/plugin-react": "^6.1.2",
     "concurrently": "^9.2.1",
     "cross-env": "^7.0.3",
-    "electron": "^44.9.3",
+    "electron": "^44.6.0",
     "electron-builder": "^26.15.3",
     "typescript": "^5.6.2",
     "vite": "^8.3.3",
-    "vitest": "^4.1.12",
     "wait-on": "^8.0.1"
   },
   "dependencies": {

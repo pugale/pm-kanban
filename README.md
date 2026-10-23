@@ -10,7 +10,7 @@ Non servono database, registrazione dell'app o licenze aggiuntive.
 
 ## 1. Requisiti (una sola volta)
 
-- **Node.js 26.12.1 o successiva** – https://nodejs.org.
+- **Node.js LTS** (versione 22.12 o successiva) – https://nodejs.org → installa la versione "LTS".
   Verifica dal terminale: `node -v`
 - **Visual Studio Code**.
 
@@ -35,7 +35,6 @@ Altri comandi:
 | Comando | A cosa serve |
 |---|---|
 | `npm start` | Compila tutto e avvia l'app come in produzione |
-| `npm test` | Esegue i test automatici |
 | `npm run typecheck` | Controlla gli errori di TypeScript senza avviare |
 | `npm run dist` | Crea l'eseguibile portatile e il setup Windows nella cartella `release` |
 
