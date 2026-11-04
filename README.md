@@ -60,12 +60,13 @@ Dal menu **Progetto → Elimina Progetto** puoi eliminare definitivamente il pro
 | Vista | Cosa puoi fare |
 |---|---|
 | **Kanban** | Trascina le card tra le colonne per cambiare stato · 🔔/🔕 attiva o disattiva le notifiche · card rossa lampeggiante = in ritardo |
+| **Tabella** | Elenco filtrato delle attività in righe · clicca il nome di una colonna per ordinare · **Esporta in CSV** salva le attività visualizzate con separatore `;` · clicca il titolo per aprire l'attività |
 | **Gantt** | Trascina la barra per spostare l'attività · trascina i bordi per cambiare inizio/fine · 📍 **Oggi** centra la linea rossa · zoom Giorno → Anno · 🔗 **Collega attività** per le dipendenze (clic sulla freccia per eliminarla) |
 | **Calendario** | Mese, settimana o giorno · sabati, domeniche e festività nazionali con sfondo rosso chiaro e nome della festa · di base mostra le attività **da iniziare** · clic su un giorno = nuova attività |
-| **Agenda** | In ritardo, Oggi, Domani e giorni successivi · filtri: tutto, da iniziare, in corso, mie attività |
+| **Agenda** | Attività raggruppate per data di inizio (Oggi, Domani e altri giorni) · evidenzia le attività in ritardo · filtri: tutto, da iniziare, in corso, mie attività |
 | **Dashboard** | Indicatori (aperte, in ritardo, in scadenza oggi/settimana, avanzamento medio) e grafici |
 
-La **ricerca** in alto filtra tutte le viste (codice, titolo, descrizione, responsabile, tag, email).
+La **ricerca** in alto filtra tutte le viste (codice, titolo, descrizione, responsabile, tag, email), inclusa la Tabella.
 
 ### Aprire e salvare file in altre cartelle
 

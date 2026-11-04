@@ -1,4 +1,4 @@
-// Vista Agenda: elenco operativo per giorno (Oggi, Domani, ...)
+// Vista Agenda: attività raggruppate per data di inizio
 
 import { useMemo, useState } from "react";
 import type { Attivita } from "../../shared/types";
@@ -25,15 +25,11 @@ export default function Agenda({ attivita, emailUtente, azioni }: Props) {
   const [mostraChiuse, setMostraChiuse] = useState(false);
 
   const sezioni = useMemo(() => {
-    const ora = Date.now();
     const oggi = inizioGiorno(new Date());
     const domani = aggiungiGiorni(oggi, 1);
     const oggiKey = chiaveGiorno(oggi);
     const domaniKey = chiaveGiorno(domani);
 
-    const filtrate: Attivita[] = [];
-    const ritardo: Attivita[] = [];
-    const giaIniziate: Attivita[] = [];
     const perGiorno = new Map<string, { giorno: Date; elenco: Attivita[] }>();
 
     for (const a of attivita) {
@@ -42,19 +38,7 @@ export default function Agenda({ attivita, emailUtente, azioni }: Props) {
       if (filtro === "in_corso" && a.stato !== "IN_CORSO") continue;
       if (filtro === "mie" && !eMia(a, emailUtente)) continue;
 
-      filtrate.push(a);
-
-      if (eInRitardo(a, ora)) {
-        ritardo.push(a);
-        continue;
-      }
-
       const inizio = new Date(a.dataOraInizio);
-      if (inizio < oggi) {
-        giaIniziate.push(a);
-        continue;
-      }
-
       const g = inizioGiorno(inizio);
       const k = chiaveGiorno(g);
       const entry = perGiorno.get(k) ?? { giorno: g, elenco: [] };
@@ -70,15 +54,10 @@ export default function Agenda({ attivita, emailUtente, azioni }: Props) {
           titolo: key === oggiKey ? "Oggi" : key === domaniKey ? "Domani" : fmtGiornoEsteso(giorno),
           sottotitolo: key === oggiKey || key === domaniKey ? fmtGiornoEsteso(giorno) : "",
           elenco: elenco.sort((a, b) => a.dataOraInizio.localeCompare(b.dataOraInizio)),
-          conData: false,
         };
       });
 
-    return [
-      ...(ritardo.length ? [{ titolo: "⚠ In ritardo", sottotitolo: "Data di fine superata", elenco: ritardo.sort((a, b) => a.dataOraFine.localeCompare(b.dataOraFine)), conData: true }] : []),
-      ...(giaIniziate.length ? [{ titolo: "Iniziate nei giorni precedenti", sottotitolo: "", elenco: giaIniziate.sort((a, b) => a.dataOraInizio.localeCompare(b.dataOraInizio)), conData: true }] : []),
-      ...giorni,
-    ];
+    return giorni;
   }, [attivita, filtro, mostraChiuse, emailUtente]);
 
   return (
@@ -104,18 +83,22 @@ export default function Agenda({ attivita, emailUtente, azioni }: Props) {
             <h3>
               {s.titolo} {s.sottotitolo && <small>{s.sottotitolo}</small>}
             </h3>
-            {s.elenco.map((a) => (
-              <div key={a.id} className={`agenda-voce ${eInRitardo(a) ? "in-ritardo" : ""}`} onClick={() => azioni.apri(a)}>
-                <span className="ora">{s.conData ? fmtDataOra(a.dataOraInizio) : fmtOra(a.dataOraInizio)}</span>
-                <i className="pallino" style={{ background: COLORI_STATO[a.stato] }} title={ETICHETTE_STATO[a.stato]} />
-                <span className="codice">{a.codice}</span>
-                <span className="titolo">{a.titolo}</span>
-                <span className="spazio" />
-                <span className="dettaglio">👤 {a.responsabile}</span>
-                <span className="dettaglio">fine {fmtDataOra(a.dataOraFine)}</span>
-                <span title="Notifiche">{ICONE_INVIA_NOTIFICA[a.invia_notifica]}</span>
-              </div>
-            ))}
+            {s.elenco.map((a) => {
+              const ritardo = eInRitardo(a);
+              return (
+                <div key={a.id} className={`agenda-voce ${ritardo ? "in-ritardo" : ""}`} onClick={() => azioni.apri(a)}>
+                  <span className="ora">{fmtOra(a.dataOraInizio)}</span>
+                  <i className="pallino" style={{ background: COLORI_STATO[a.stato] }} title={ETICHETTE_STATO[a.stato]} />
+                  <span className="codice">{a.codice}</span>
+                  <span className="titolo">{a.titolo}</span>
+                  {ritardo && <span className="testo-ritardo">⚠ In ritardo</span>}
+                  <span className="spazio" />
+                  <span className="dettaglio">👤 {a.responsabile}</span>
+                  <span className="dettaglio">fine {fmtDataOra(a.dataOraFine)}</span>
+                  <span title="Notifiche">{ICONE_INVIA_NOTIFICA[a.invia_notifica]}</span>
+                </div>
+              );
+            })}
           </section>
         ))}
         {!sezioni.length && <div className="vuoto">Nessuna attività in programma con il filtro scelto.</div>}

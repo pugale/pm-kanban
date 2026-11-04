@@ -1,6 +1,7 @@
 // Canali tra interfaccia React e processo principale
 
 import { BrowserWindow, dialog, ipcMain, type OpenDialogOptions, type SaveDialogOptions } from "electron";
+import { writeFile } from "fs/promises";
 import path from "path";
 import type { DatiNuovoProgetto } from "../shared/api";
 import { ErroreApp, type CodiceErrore, type DatiAttivita, type IdAttivita, type Impostazioni, type Risultato, type StatoAttivita, type TipoDipendenza } from "../shared/types";
@@ -63,6 +64,19 @@ export function registraIpc(): void {
     if (r.canceled || !r.filePath) return null;
     const destinazione = path.extname(r.filePath) ? r.filePath : `${r.filePath}.json`;
     await store.esportaProgetto(progettoId, destinazione);
+    return path.basename(destinazione);
+  });
+  gestisci("file:esportaCsv", async (contenuto: string) => {
+    const finestra = BrowserWindow.getFocusedWindow();
+    const opzioni: SaveDialogOptions = {
+      title: "Esporta attività in CSV",
+      defaultPath: "attivita.csv",
+      filters: [{ name: "File CSV", extensions: ["csv"] }],
+    };
+    const r = finestra ? await dialog.showSaveDialog(finestra, opzioni) : await dialog.showSaveDialog(opzioni);
+    if (r.canceled || !r.filePath) return null;
+    const destinazione = path.extname(r.filePath) ? r.filePath : `${r.filePath}.csv`;
+    await writeFile(destinazione, contenuto, "utf8");
     return path.basename(destinazione);
   });
 

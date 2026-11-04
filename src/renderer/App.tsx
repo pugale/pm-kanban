@@ -12,13 +12,15 @@ import Dashboard from "./views/Dashboard";
 import Gantt from "./views/Gantt";
 import Impostazioni from "./views/Impostazioni";
 import Kanban from "./views/Kanban";
+import Tabella from "./views/Tabella";
 
-type Vista = "kanban" | "gantt" | "calendario" | "agenda" | "dashboard" | "impostazioni";
+type Vista = "kanban" | "tabella" | "gantt" | "calendario" | "agenda" | "dashboard" | "impostazioni";
 const VISTE: { id: Vista; testo: string }[] = [
   { id: "kanban", testo: "📋 Kanban" },
   { id: "gantt", testo: "📊 Gantt" },
   { id: "calendario", testo: "📅 Calendario" },
   { id: "agenda", testo: "📝 Agenda" },
+  { id: "tabella", testo: "📑 Tabella" },
   { id: "dashboard", testo: "📈 Dashboard" },
 ];
 
@@ -270,6 +272,7 @@ export default function App() {
     }
 
     if (vista === "kanban") return <Kanban attivita={attivitaFiltrate} solaLettura={solaLettura} azioni={azioni} />;
+    if (vista === "tabella") return <Tabella attivita={attivitaFiltrate} azioni={azioni} />;
     if (vista === "gantt") return <Gantt attivita={attivitaFiltrate} dipendenze={dati.dipendenze} solaLettura={solaLettura} azioni={azioni} />;
     if (vista === "calendario") return <Calendario attivita={attivitaFiltrate} solaLettura={solaLettura} azioni={azioni} />;
     if (vista === "agenda") return <Agenda attivita={attivitaFiltrate} emailUtente={impostazioni?.emailUtente} azioni={azioni} />;
