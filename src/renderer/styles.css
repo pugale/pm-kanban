@@ -162,8 +162,12 @@ code { background: #eef2f6; padding: 1px 5px; border-radius: 4px; }
 .gantt-etichette { position: sticky; left: 0; z-index: 4; background: #fff; border-right: 1px solid var(--bordo); height: 100%; }
 .gantt-etichetta { display: flex; align-items: center; gap: 6px; padding: 0 10px; border-bottom: 1px solid #f0f2f5; cursor: pointer; overflow: hidden; }
 .gantt-etichetta:hover { background: #f3f7fb; }
+.gantt-etichetta.origine { background: #fff3cd; }
 .gantt-etichetta i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .gantt-etichetta .titolo { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gantt-etichetta .rientro { color: var(--testo-tenue); flex-shrink: 0; text-align: right; box-sizing: border-box; padding-right: 4px; }
+.gantt-ridimensiona { position: absolute; top: 0; right: -3px; bottom: 0; width: 7px; cursor: col-resize; z-index: 7; }
+.gantt-ridimensiona:hover { background: rgba(33, 150, 243, .35); }
 .gantt-area { position: absolute; top: 0; bottom: 0; }
 .riga-gantt { position: absolute; left: 0; right: 0; border-bottom: 1px solid #f0f2f5; }
 .sfondo-weekend { position: absolute; top: 0; bottom: 0; background: #f6f8fa; }

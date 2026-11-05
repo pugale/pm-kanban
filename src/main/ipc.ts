@@ -80,6 +80,22 @@ export function registraIpc(): void {
     return path.basename(destinazione);
   });
 
+  gestisci("file:esportaPng", async (base64: string, nomePredefinito: string) => {
+    if (typeof base64 !== "string" || !/^[A-Za-z0-9+/=]+$/.test(base64)) throw new ErroreApp("VALIDAZIONE", "Immagine non valida.");
+    const finestra = BrowserWindow.getFocusedWindow();
+    const nome = path.basename(String(nomePredefinito || "gantt.png")).replace(/[\\/:*?"<>|]/g, "_");
+    const opzioni: SaveDialogOptions = {
+      title: "Esporta il Gantt come immagine",
+      defaultPath: nome,
+      filters: [{ name: "Immagine PNG", extensions: ["png"] }],
+    };
+    const r = finestra ? await dialog.showSaveDialog(finestra, opzioni) : await dialog.showSaveDialog(opzioni);
+    if (r.canceled || !r.filePath) return null;
+    const destinazione = path.extname(r.filePath) ? r.filePath : `${r.filePath}.png`;
+    await writeFile(destinazione, Buffer.from(base64, "base64"));
+    return path.basename(destinazione);
+  });
+
   // Attività
   gestisci("attivita:elenco", (progettoId: string) => att.elencoAttivita(progettoId));
   gestisci("attivita:prossimoCodice", (progettoId: string) => att.prossimoCodice(progettoId));

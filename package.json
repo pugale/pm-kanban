@@ -1,7 +1,7 @@
 {
   "name": "pm-kanban",
   "productName": "PM-Kanban",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "PM-Kanban: gestione attività di progetto con Kanban, Gantt, Calendario, Agenda e Dashboard. Dati su cartella SharePoint sincronizzata.",
   "private": true,
   "main": "dist-electron/main/main.js",

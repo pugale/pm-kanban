@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent 
 import type { Attivita, Dipendenza, TipoDipendenza } from "../../shared/types";
 import type { AzioniVista } from "../tipiVista";
 import { COLORI_STATO, ETICHETTE_DIPENDENZA, ETICHETTE_STATO, eInRitardo } from "../utils/attivita";
+import { ganttInPng } from "../utils/esportaGanttPng";
 import { MESI_BREVI, MS_GIORNO, MS_ORA, NOMI_MESI, aggiungiGiorni, aggiungiMesi, fmtDataOra, inizioGiorno, inizioSettimana } from "../utils/date";
 
 interface Props {
@@ -82,8 +83,38 @@ function calcolaTestata(da: Date, a: Date, pxGiorno: number) {
   return { sotto, sopra };
 }
 
-export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Props) {
+export default function Gantt({ attivita: attivitaProp, dipendenze, solaLettura, azioni }: Props) {
+  // Righe in ordine gerarchico: il padre è l'attività di partenza di un collegamento, la figlia quella di arrivo (indentata sotto il padre)
+  const { attivita, profondita } = useMemo(() => {
+    const ids = new Set(attivitaProp.map((a) => a.id));
+    const padreDi = new Map<number, number>();
+    for (const d of dipendenze) {
+      if (ids.has(d.origineId) && ids.has(d.destinazioneId) && d.origineId !== d.destinazioneId && !padreDi.has(d.destinazioneId))
+        padreDi.set(d.destinazioneId, d.origineId);
+    }
+    const figli = new Map<number | undefined, Attivita[]>();
+    for (const a of attivitaProp) {
+      const k = padreDi.get(a.id);
+      figli.set(k, [...(figli.get(k) ?? []), a]);
+    }
+    const ordinate: Attivita[] = [];
+    const prof = new Map<number, number>();
+    const visita = (k: number | undefined, livello: number) => {
+      for (const a of figli.get(k) ?? []) {
+        if (prof.has(a.id)) continue;
+        prof.set(a.id, livello);
+        ordinate.push(a);
+        visita(a.id, livello + 1);
+      }
+    };
+    visita(undefined, 0);
+    // eventuali cicli nel file: le attività non raggiunte restano visibili al livello principale
+    for (const a of attivitaProp) if (!prof.has(a.id)) (prof.set(a.id, 0), ordinate.push(a));
+    return { attivita: ordinate, profondita: prof };
+  }, [attivitaProp, dipendenze]);
   const [zoom, setZoom] = useState<LivelloZoom>("Settimana");
+  const [esportazione, setEsportazione] = useState<{ tipo: "errore" | "info"; testo: string } | null>(null);
+  const [larghezzaEtichette, setLarghezzaEtichette] = useState(LARGHEZZA_ETICHETTE);
   const [trascina, setTrascina] = useState<Trascinamento | null>(null);
   const [collega, setCollega] = useState(false);
   const [tipoCollegamento, setTipoCollegamento] = useState<TipoDipendenza>("FS");
@@ -136,8 +167,23 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
   function vaiAOggi(comportamento: ScrollBehavior = "smooth") {
     const c = contenitore.current;
     if (!c) return;
-    const visibile = c.clientWidth - LARGHEZZA_ETICHETTE;
+    const visibile = c.clientWidth - larghezzaEtichette;
     c.scrollTo({ left: Math.max(0, x(Date.now()) - visibile / 2), behavior: comportamento });
+  }
+
+  function iniziaRidimensionamento(e: ReactMouseEvent) {
+    e.preventDefault();
+    const x0 = e.clientX;
+    const l0 = larghezzaEtichette;
+    const muovi = (ev: MouseEvent) => setLarghezzaEtichette(Math.min(800, Math.max(150, l0 + ev.clientX - x0)));
+    const rilascia = () => {
+      window.removeEventListener("mousemove", muovi);
+      window.removeEventListener("mouseup", rilascia);
+      document.body.style.cursor = "";
+    };
+    document.body.style.cursor = "col-resize";
+    window.addEventListener("mousemove", muovi);
+    window.addEventListener("mouseup", rilascia);
   }
 
   // All'apertura e al cambio di zoom la vista si centra su oggi
@@ -188,19 +234,20 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
     return { inizio: t.inizio0, fine: Math.max(t.fine0 + t.delta, t.inizio0) };
   }
 
+  function selezionaPerCollegamento(a: Attivita) {
+    if (!origine) setOrigine(a.id);
+    else if (origine !== a.id) {
+      void azioni.creaDipendenza(origine, a.id, tipoCollegamento);
+      setOrigine(null);
+    }
+  }
+
   function premiBarra(e: ReactMouseEvent, a: Attivita, modo: Modo) {
     if (e.button !== 0) return;
     e.stopPropagation();
     e.preventDefault();
 
-    if (collega) {
-      if (!origine) setOrigine(a.id);
-      else if (origine !== a.id) {
-        void azioni.creaDipendenza(origine, a.id, tipoCollegamento);
-        setOrigine(null);
-      }
-      return;
-    }
+    if (collega) return selezionaPerCollegamento(a);
     if (solaLettura) return azioni.apri(a);
     setTrascina({
       id: a.id,
@@ -233,6 +280,32 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
 
   const altezzaCorpo = Math.max(attivita.length * ALTEZZA_RIGA, 200);
   const xOggi = x(ora);
+
+  async function esportaPng() {
+    try {
+      const base64 = ganttInPng({
+        attivita,
+        profondita,
+        testata,
+        posizioni,
+        dipendenze,
+        percorsoFreccia,
+        x,
+        larghezzaEtichette,
+        larghezza,
+        altezzaRiga: ALTEZZA_RIGA,
+        altezzaTestata: ALTEZZA_TESTATA,
+        altezzaCorpo,
+        xOggi,
+        inRitardo: (a) => eInRitardo(a, ora),
+      });
+      const r = await window.pm.esportaPng(base64, "gantt.png");
+      if (!r.ok) setEsportazione({ tipo: "errore", testo: r.messaggio });
+      else if (r.dati) setEsportazione({ tipo: "info", testo: `Immagine salvata come "${r.dati}".` });
+    } catch (e) {
+      setEsportazione({ tipo: "errore", testo: (e as Error).message });
+    }
+  }
 
   return (
     <div className="gantt">
@@ -269,6 +342,9 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
             )}
           </>
         )}
+        <span className="separatore" />
+        <button className="btn" onClick={() => void esportaPng()} title="Salva tutto il Gantt come immagine PNG">🖼 Esporta PNG</button>
+        {esportazione && <span className={esportazione.tipo === "errore" ? "testo-ritardo" : "suggerimento"} role="status">{esportazione.testo}</span>}
         <span className="spazio" />
         <span className="legenda">
           {(Object.keys(COLORI_STATO) as (keyof typeof COLORI_STATO)[]).map((s) => (
@@ -278,10 +354,13 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
       </div>
 
       <div className="gantt-scorrimento" ref={contenitore}>
-        <div className="gantt-contenuto" style={{ width: LARGHEZZA_ETICHETTE + larghezza }}>
+        <div className="gantt-contenuto" style={{ width: larghezzaEtichette + larghezza }}>
           {/* Testata (fissa in alto durante lo scorrimento verticale) */}
           <div className="gantt-testata" style={{ height: ALTEZZA_TESTATA }}>
-            <div className="gantt-angolo" style={{ width: LARGHEZZA_ETICHETTE }}>Attività</div>
+            <div className="gantt-angolo" style={{ width: larghezzaEtichette }}>
+              Attività
+              <div className="gantt-ridimensiona" onMouseDown={iniziaRidimensionamento} title="Trascina per cambiare la larghezza" />
+            </div>
             <div className="gantt-scala" style={{ width: larghezza }}>
               {testata.sopra.map((s) => (
                 <div key={`a${s.inizio}`} className="cella-sopra" style={{ left: x(s.inizio), width: x(s.fine) - x(s.inizio) }}>{s.testo}</div>
@@ -295,17 +374,18 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
 
           <div className="gantt-corpo" style={{ height: altezzaCorpo }}>
             {/* Etichette (fisse a sinistra durante lo scorrimento orizzontale) */}
-            <div className="gantt-etichette" style={{ width: LARGHEZZA_ETICHETTE }}>
+            <div className="gantt-etichette" style={{ width: larghezzaEtichette }}>
               {attivita.map((a) => (
-                <div key={a.id} className="gantt-etichetta" style={{ height: ALTEZZA_RIGA }} onClick={() => azioni.apri(a)} title={a.titolo}>
+                <div key={a.id} className={`gantt-etichetta ${collega && origine === a.id ? "origine" : ""}`} style={{ height: ALTEZZA_RIGA }} onClick={() => (collega ? selezionaPerCollegamento(a) : azioni.apri(a))} title={a.titolo}>
                   <i style={{ background: COLORI_STATO[a.stato] }} />
+                  {(profondita.get(a.id) ?? 0) > 0 && <span className="rientro" style={{ width: (profondita.get(a.id) ?? 0) * 24 }}>↳</span>}
                   <span className="codice">{a.codice}</span>
                   <span className="titolo">{a.titolo}</span>
                 </div>
               ))}
             </div>
 
-            <div className="gantt-area" style={{ left: LARGHEZZA_ETICHETTE, width: larghezza }}>
+            <div className="gantt-area" style={{ left: larghezzaEtichette, width: larghezza }}>
               {/* Sfondo: fine settimana e righe */}
               {pxGiorno >= 24 &&
                 testata.sotto.filter((s) => s.weekend).map((s) => (
@@ -338,7 +418,7 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
                           void azioni.eliminaDipendenza(d.id);
                       }}
                     >
-                      <title>{`${o.codice} → ${t.codice} · ${ETICHETTE_DIPENDENZA[d.tipo]}`}</title>
+                      <title>{`${o.codice} → ${t.codice} · ${ETICHETTE_DIPENDENZA[d.tipo]}${solaLettura ? "" : "\nClicca per eliminare il collegamento"}`}</title>
                     </path>
                   );
                 })}
@@ -359,14 +439,16 @@ export default function Gantt({ attivita, dipendenze, solaLettura, azioni }: Pro
                     title={`${a.codice} – ${a.titolo}\n${fmtDataOra(new Date(pos.inizio))} → ${fmtDataOra(new Date(pos.fine))}\nAvanzamento ${a.percentualeCompletamento}%${ritardo ? "\n⚠ In ritardo" : ""}`}
                   >
                     <div className="avanzamento" style={{ width: `${a.percentualeCompletamento}%` }} />
-                    {larghezzaBarra > 70 && <span className="testo-barra">{a.percentualeCompletamento}% · {a.codice}</span>}
+                    {larghezzaBarra >= 32 && (
+                      <span className="testo-barra">{a.percentualeCompletamento}%{larghezzaBarra > 70 ? ` · ${a.codice}` : ""}</span>
+                    )}
                     {!solaLettura && !collega && (
                       <>
                         <div className="maniglia sinistra" onMouseDown={(e) => premiBarra(e, a, "inizio")} />
                         <div className="maniglia destra" onMouseDown={(e) => premiBarra(e, a, "fine")} />
                       </>
                     )}
-                    {larghezzaBarra <= 70 && <span className="testo-fuori">{a.codice}</span>}
+                    {larghezzaBarra <= 70 && <span className="testo-fuori">{larghezzaBarra < 32 ? `${a.percentualeCompletamento}% · ` : ""}{a.codice}</span>}
                   </div>
                 );
               })}

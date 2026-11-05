@@ -30,6 +30,8 @@ export interface PmApi {
   apriProgettoDaFile(): Promise<Risultato<{ info: InfoProgetto; dati: DatiProgetto } | null>>;
   esportaProgetto(progettoId: string): Promise<Risultato<string | null>>;
   esportaCsv(contenuto: string): Promise<Risultato<string | null>>;
+  /** Salva un'immagine PNG (contenuto in base64) scegliendo il file con una finestra di dialogo */
+  esportaPng(base64: string, nomePredefinito: string): Promise<Risultato<string | null>>;
 
   // Attività
   attivita(progettoId: string): Promise<Risultato<DatiProgetto>>;
