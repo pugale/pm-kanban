@@ -17,6 +17,7 @@ const api: PmApi = {
   esportaProgetto: (progettoId) => invoca("progetti:esporta", progettoId),
   esportaCsv: (contenuto) => invoca("file:esportaCsv", contenuto),
   esportaPng: (base64, nomePredefinito) => invoca("file:esportaPng", base64, nomePredefinito),
+  apriManuale: () => invoca("manuale:apri"),
 
   attivita: (progettoId) => invoca("attivita:elenco", progettoId),
   prossimoCodice: (progettoId) => invoca("attivita:prossimoCodice", progettoId),

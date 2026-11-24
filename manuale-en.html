@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM-Kanban User Manual</title>
+  <style>
+    :root { --blue:#0f6cbd; --blue2:#dbeafb; --bg:#f4f6fa; --panel:#fff; --text:#1f2933; --muted:#66788a; --border:#dde3ea; --red:#c62828; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin:0; background:var(--bg); color:var(--text); font:15px/1.6 "Segoe UI",Arial,sans-serif; }
+    header { position:sticky; top:0; z-index:10; background:var(--panel); border-bottom:1px solid var(--border); }
+    nav { max-width:1160px; margin:auto; padding:10px 20px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    nav strong { margin-right:8px; color:var(--blue); font-size:18px; }
+    nav a { color:var(--text); text-decoration:none; border-radius:6px; padding:6px 9px; }
+    nav a:hover, nav a.active { background:var(--blue2); color:var(--blue); }
+    .language { margin-left:auto; }
+    main { max-width:1160px; margin:24px auto 60px; padding:0 20px; }
+    section { background:var(--panel); border:1px solid var(--border); border-radius:10px; margin:0 0 18px; padding:24px; }
+    h1,h2,h3 { color:var(--blue); line-height:1.25; }
+    h1 { margin-top:0; font-size:34px; }
+    h2 { margin-top:0; border-bottom:1px solid var(--border); padding-bottom:8px; }
+    h3 { margin-bottom:6px; }
+    p { margin:8px 0 12px; }
+    ul,ol { padding-left:24px; }
+    li { margin:4px 0; }
+    table { width:100%; border-collapse:collapse; margin:12px 0; }
+    th,td { border:1px solid var(--border); padding:8px 10px; vertical-align:top; text-align:left; }
+    th { background:#eef3f8; color:#334155; }
+    code { background:#eef2f6; border-radius:4px; padding:1px 5px; }
+    .lead { font-size:18px; color:#3e4c59; }
+    .note { border-left:4px solid var(--blue); background:#edf6ff; padding:12px 14px; margin:12px 0; }
+    .warning { border-left-color:var(--red); background:#fff1f0; }
+    .author { background:linear-gradient(135deg,#f0f7ff,#fff); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
+    .card { border:1px solid var(--border); border-radius:8px; padding:14px; }
+    footer { color:var(--muted); text-align:center; padding-bottom:30px; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Manual contents">
+      <strong>PM-Kanban</strong>
+      <a href="#introduction">Introduction</a>
+      <a href="#setup">Setup</a>
+      <a href="#projects">Projects</a>
+      <a href="#tasks">Tasks</a>
+      <a href="#views">Views</a>
+      <a href="#data">Data and safety</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+      <a href="manuale.html">Italiano</a>
+      <a class="language active" href="manuale-en.html">English</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="introduction">
+      <h1>PM-Kanban User Manual</h1>
+      <p class="lead">PM-Kanban is a desktop application for managing projects and tasks from one data source, presented as a Kanban board, Gantt chart, calendar, agenda, table and dashboard.</p>
+      <p>Data is kept in JSON files stored in a SharePoint folder synchronized by OneDrive. The program needs no database, application registration or additional license. Teams and email notifications can be delivered by a Power Automate flow connected to the project data.</p>
+      <div class="note"><strong>Global search:</strong> the field at the top filters every view by task code, title, description, owner, tag and email address.</div>
+    </section>
+
+    <section id="setup">
+      <h2>1. First launch and setup</h2>
+      <ol>
+        <li>In the team's SharePoint Document Library, create a dedicated folder, for example <code>PM-Kanban</code>.</li>
+        <li>Select <strong>Sync</strong> or <strong>Add shortcut to OneDrive</strong> so that the folder appears in File Explorer.</li>
+        <li>Open PM-Kanban and enter <strong>Settings</strong> using the ⚙️ button.</li>
+        <li>Enter a valid business email address and, optionally, your name.</li>
+        <li>Select <strong>Save</strong>.</li>
+        <li>Select the synchronized SharePoint folder with <strong>Choose folder…</strong>.</li>
+      </ol>
+      <p>The email address identifies the project owner. The user who creates a project is its only editor; users opening it with a different email see it read-only. The configured email is automatically suggested as the owner of new tasks.</p>
+      <p>The Settings page can also run <strong>Check now</strong>, comparing tasks with the delivery registry written by Power Automate. The same check runs automatically every five minutes.</p>
+      <div class="note">Local settings (email, name and folder) are saved on the PC, not in the project file.</div>
+    </section>
+
+    <section id="projects">
+      <h2>2. Project management</h2>
+      <p>The <strong>Project</strong> menu and adjacent selector let you switch projects and perform the main project operations.</p>
+      <div class="grid">
+        <div class="card"><h3>New project</h3><p>Requires a name and optionally accepts a customer, code prefix and tags. If the prefix is empty, one is suggested from the first word of the name. Each project is saved as a JSON file.</p></div>
+        <div class="card"><h3>Open project</h3><p><strong>Open Project</strong> selects a JSON file even outside the configured folder. The file remains in its original location and subsequent edits are saved there during the session.</p></div>
+        <div class="card"><h3>Save a copy</h3><p>Creates an updated copy at a selected location. It does not replace the open file and does not change where subsequent edits are saved.</p></div>
+        <div class="card"><h3>Delete project</h3><p>Available only to the owner. After confirmation, it deletes the project file, its tasks and all associated attachments.</p></div>
+      </div>
+      <p>The selected project and last view are remembered on the PC. The app detects changes from OneDrive or other computers and refreshes the project list and data.</p>
+    </section>
+
+    <section id="tasks">
+      <h2>3. Creating and managing tasks</h2>
+      <p>Select <strong>+ New task</strong> or press <kbd>Ctrl+N</kbd>. Clicking a card, table row or other task item opens its details.</p>
+      <table>
+        <thead><tr><th>Field or command</th><th>Behavior</th></tr></thead>
+        <tbody>
+          <tr><td>Code</td><td>Optional on creation. If blank, a unique code such as <code>SARA-001</code> is generated from the project prefix.</td></tr>
+          <tr><td>Title, description</td><td>The title is required; the description is free text.</td></tr>
+          <tr><td>Status</td><td>In preparation, Ready to start, In progress, On hold, Completed or Cancelled.</td></tr>
+          <tr><td>Priority</td><td>Low, Medium, High or Critical.</td></tr>
+          <tr><td>Start and end</td><td>Required dates and times. The end cannot be earlier than the start. Changing the start preserves duration and notification lead time whenever possible.</td></tr>
+          <tr><td>Owners</td><td>At least one valid email address. Multiple addresses can be separated by semicolons. All owners receive the notification.</td></tr>
+          <tr><td>Participants</td><td>Optional email addresses, separated by semicolons or lines. They also receive the notification.</td></tr>
+          <tr><td>Tags</td><td>Comma-separated labels, also included in global search.</td></tr>
+          <tr><td>Progress</td><td>From 0 to 100% in steps of 5 in the form. Completed tasks must be at 100%.</td></tr>
+          <tr><td>Notification</td><td>Enabled, disabled or already sent. Future tasks default to enabled, with delivery 15 minutes before the start. If the proposed time has passed, the app suggests the first suitable future time.</td></tr>
+          <tr><td>Channel</td><td>Teams, email or both. A configured Power Automate flow delivers the notification to owners and participants.</td></tr>
+          <tr><td>Links</td><td>URLs categorized as SharePoint, Teams, Jira, DevOps, Planner or Other. Links open in the default browser.</td></tr>
+          <tr><td>Attachments</td><td>After the first save, multiple files can be added, opened and removed. They are copied beneath the app's data folder.</td></tr>
+          <tr><td>Duplicate and delete</td><td>Duplication creates a new task. Deletion removes attachments and Gantt dependencies after confirmation.</td></tr>
+        </tbody>
+      </table>
+      <p>The bottom of the form displays creation time, last update and the user who made it. In read-only mode, fields remain visible but cannot be edited.</p>
+    </section>
+
+    <section id="views">
+      <h2>4. The six operational views</h2>
+
+      <h3>Kanban</h3>
+      <ul>
+        <li>One column for every status, including a task count.</li>
+        <li>Drag a card between columns to change its status.</li>
+        <li>Cards show code, priority, title, owners, dates, progress, participants and attachments.</li>
+        <li>Open tasks past their end time are marked with a flashing red outline.</li>
+        <li>The 🔔/🔕 button directly enables or disables notifications. A sent notification cannot be enabled again without changing its date or channel in task details.</li>
+      </ul>
+
+      <h3>Gantt</h3>
+      <ul>
+        <li>Displays all filtered tasks from Day to Year scale, with shaded weekends and a red "Today" line.</li>
+        <li>Drag a bar to move the task; drag its left or right edge to change the start or end.</li>
+        <li>Dragging snaps to one hour at Day scale and one day at the other scales.</li>
+        <li><strong>Today</strong> centers the current-time line; zoom controls and the menu change the scale.</li>
+        <li>The Task column can be resized by dragging the right edge of its heading.</li>
+        <li><strong>Link tasks</strong> creates FS (finish-to-start), SS (start-to-start), FF (finish-to-finish) or SF (start-to-finish) dependencies. Select the predecessor and then the successor. <kbd>Esc</kbd> cancels.</li>
+        <li>Arrows show the dependency type; clicking an arrow while editing and confirming removes it.</li>
+        <li>The predecessor is displayed as the parent and the successor as an indented child.</li>
+        <li><strong>Export PNG</strong> saves the entire Gantt, not just the visible area, using the current zoom and column width. Oversized images are reduced.</li>
+      </ul>
+
+      <h3>Calendar</h3>
+      <ul>
+        <li>Month, week or day views, previous/next navigation and a return to Today.</li>
+        <li>Tasks appear on their start date. Any status can be included or excluded; only Ready to start is selected initially.</li>
+        <li>Saturdays, Sundays and Italian public holidays use a light-red background, and holiday names are shown.</li>
+        <li>Supported holidays: New Year's Day, Epiphany, Easter and Easter Monday, 25 April, 1 May, 2 June, 15 August, 4 October from 2026, All Saints' Day, Immaculate Conception, Christmas and St Stephen's Day.</li>
+        <li>Clicking a day creates, when permitted, a task starting at 9:00 with a default duration of one hour.</li>
+      </ul>
+
+      <h3>Agenda</h3>
+      <p>Groups tasks by start date under Today, Tomorrow and later dates. It can filter all tasks, Ready to start, In progress or tasks assigned to the current user. Completed and cancelled tasks are hidden by default but can be shown. Overdue tasks are highlighted.</p>
+
+      <h3>Table</h3>
+      <p>Shows code, title, status, priority, owner, start, end and progress. Clicking a column heading sorts ascending or descending. <strong>Export to CSV</strong> saves the displayed, sorted tasks with a semicolon separator, UTF-8 encoding and protection against spreadsheet formula injection.</p>
+
+      <h3>Dashboard</h3>
+      <ul>
+        <li>Metrics for total, open, completed, overdue, due today, due this week and average progress.</li>
+        <li>Charts by status, priority of open tasks, top ten owners by workload and completions over the last eight weeks.</li>
+        <li>Clickable lists for overdue tasks and tasks due today.</li>
+        <li>All values respect the global search filter.</li>
+      </ul>
+    </section>
+
+    <section id="data">
+      <h2>5. Storage, synchronization and checks</h2>
+      <h3>Where data is stored</h3>
+      <ul>
+        <li>Each project is a JSON file in the synchronized SharePoint folder.</li>
+        <li>Attachments are stored in <code>attachments/&lt;projectId&gt;/&lt;taskId&gt;/</code> (Italian folder name: <code>allegati</code>).</li>
+        <li><code>_notifiche-inviate.json</code> is the delivery registry written by the Power Automate flow.</li>
+        <li>Copies created with Save a Copy can be opened and managed outside the default folder.</li>
+      </ul>
+      <h3>Save reliability</h3>
+      <ul>
+        <li>The project file is read from disk before every change to reduce the risk of overwriting another user's work.</li>
+        <li>Every task has a version number. A concurrent edit produces a conflict warning and reloads the latest data.</li>
+        <li>Saving uses a temporary file and rename operation, retrying when OneDrive temporarily locks the file.</li>
+        <li>File structure is validated on every read and before every save. Duplicate codes, invalid references, inconsistent dates and unexpected fields are reported.</li>
+        <li>Self-links, duplicate dependencies and dependency cycles are not allowed.</li>
+        <li>OneDrive conflict copies are reported above the work area.</li>
+        <li>Dates are stored as UTC and displayed in the PC's local time.</li>
+        <li>SharePoint version history can be used as an additional backup.</li>
+      </ul>
+      <div class="note warning"><strong>Read-only:</strong> edits, dragging, deletion and task links are disabled when the configured email does not match the project owner.</div>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>6. Common problems</h2>
+      <table>
+        <thead><tr><th>Message or situation</th><th>Solution</th></tr></thead>
+        <tbody>
+          <tr><td>Folder unavailable</td><td>Check that OneDrive is running and the SharePoint folder is still synchronized, then select it again in Settings.</td></tr>
+          <tr><td>Project is read-only</td><td>The email in Settings must match the owner stored in the project.</td></tr>
+          <tr><td>Invalid structure</td><td>The file was edited manually or is damaged. Check the field reported by the error or restore an earlier version from SharePoint.</td></tr>
+          <tr><td>Conflict copy</td><td>Compare the files listed in the warning. The app uses one copy; after choosing the correct data, delete the extra copies from the folder.</td></tr>
+          <tr><td>Notification state has not updated</td><td>Check the Power Automate flow and use Check now. PM-Kanban does not send Teams messages or emails directly.</td></tr>
+          <tr><td>A second window does not open</td><td>PM-Kanban allows only one instance at a time to prevent concurrent writes; the existing window is brought to the front.</td></tr>
+          <tr><td>The manual does not open</td><td>Use the ? button again. If the manual files have been moved from the application folder, reinstall PM-Kanban.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="author" class="author">
+      <h2>Author and contact</h2>
+      <p><strong>Author:</strong> Alessandro Puglisi</p>
+      <p><strong>Email:</strong> <a href="mailto:ing.puglisi@gmail.com">ing.puglisi@gmail.com</a></p>
+      <p>Language version: <a href="manuale.html">Italiano</a> · <a href="manuale-en.html">English</a></p>
+    </section>
+  </main>
+  <footer>PM-Kanban — User Manual</footer>
+</body>
+</html>

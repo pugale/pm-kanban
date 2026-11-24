@@ -224,6 +224,11 @@ export default function App() {
     await caricaElenco();
   };
 
+  const apriManuale = async () => {
+    const r = await window.pm.apriManuale();
+    if (!r.ok) setMessaggio({ tipo: "errore", testo: r.messaggio });
+  };
+
   // Scorciatoia: Ctrl+N nuova attività
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
@@ -340,7 +345,7 @@ export default function App() {
           </>
         )}
         {!configurata && <span className="spazio" />}
-        {/* Impostazioni: subito a destra di "Nuova attività" */}
+        <button className="btn-aiuto" onClick={() => void apriManuale()} title="Apri il manuale" aria-label="Apri il manuale">?</button>
         <button className={`btn-icona grande ${vista === "impostazioni" ? "attivo" : ""}`} onClick={() => setVista("impostazioni")} title="Impostazioni">⚙️</button>
       </header>
 

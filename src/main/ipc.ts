@@ -1,6 +1,6 @@
 // Canali tra interfaccia React e processo principale
 
-import { BrowserWindow, dialog, ipcMain, type OpenDialogOptions, type SaveDialogOptions } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, shell, type OpenDialogOptions, type SaveDialogOptions } from "electron";
 import { writeFile } from "fs/promises";
 import path from "path";
 import type { DatiNuovoProgetto } from "../shared/api";
@@ -24,6 +24,14 @@ function gestisci<A extends unknown[], T>(canale: string, fn: (...args: A) => Pr
 }
 
 export function registraIpc(): void {
+  gestisci("manuale:apri", async () => {
+    const percorso = app.isPackaged
+      ? path.join(process.resourcesPath, "manuale.html")
+      : path.join(app.getAppPath(), "manuale.html");
+    const errore = await shell.openPath(percorso);
+    if (errore) throw new ErroreApp("ERRORE", `Impossibile aprire il manuale: ${errore}`);
+  });
+
   // Impostazioni
   gestisci("impostazioni:leggi", () => leggiImpostazioni());
   gestisci("impostazioni:salva", (m: Pick<Impostazioni, "emailUtente" | "nomeUtente">) =>

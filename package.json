@@ -47,6 +47,16 @@
       "resources/**",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "manuale.html",
+        "to": "manuale.html"
+      },
+      {
+        "from": "manuale-en.html",
+        "to": "manuale-en.html"
+      }
+    ],
     "win": {
       "target": [
         "portable",

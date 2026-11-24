@@ -55,6 +55,12 @@ code { background: #eef2f6; padding: 1px 5px; border-radius: 4px; }
 .btn-icona:hover:not(:disabled) { background: #e8edf2; }
 .btn-icona.grande { font-size: 18px; padding: 4px 8px; }
 .btn-icona.attivo { background: #dbeafb; }
+.btn-aiuto {
+  width: 28px; height: 28px; border: 1px solid var(--primario);
+  border-radius: 50%; background: #fff; color: var(--primario);
+  font-size: 18px; font-weight: 700; line-height: 1; padding: 0;
+}
+.btn-aiuto:hover { background: #dbeafb; }
 .link { border: none; background: none; color: var(--primario); padding: 0; text-align: left; }
 .link:hover { text-decoration: underline; }
 .gruppo-pulsanti { display: inline-flex; }

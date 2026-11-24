@@ -1,191 +1,213 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Manuale PM-Kanban</title>
-    <style>
-      :root {
-        --bg: #f5f7fb;
-        --panel: #ffffff;
-        --primary: #2f6fed;
-        --primary-dark: #1f4fc1;
-        --text: #1f2937;
-        --muted: #6b7280;
-        --border: #dfe7f5;
-        --accent: #edf3ff;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manuale PM-Kanban</title>
+  <style>
+    :root { --blu:#0f6cbd; --blu2:#dbeafb; --sfondo:#f4f6fa; --pannello:#fff; --testo:#1f2933; --tenue:#66788a; --bordo:#dde3ea; --rosso:#c62828; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin:0; background:var(--sfondo); color:var(--testo); font:15px/1.6 "Segoe UI",Arial,sans-serif; }
+    header { position:sticky; top:0; z-index:10; background:var(--pannello); border-bottom:1px solid var(--bordo); }
+    nav { max-width:1160px; margin:auto; padding:10px 20px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    nav strong { margin-right:8px; color:var(--blu); font-size:18px; }
+    nav a { color:var(--testo); text-decoration:none; border-radius:6px; padding:6px 9px; }
+    nav a:hover, nav a.attivo { background:var(--blu2); color:var(--blu); }
+    .lingua { margin-left:auto; }
+    main { max-width:1160px; margin:24px auto 60px; padding:0 20px; }
+    section { background:var(--pannello); border:1px solid var(--bordo); border-radius:10px; margin:0 0 18px; padding:24px; }
+    h1,h2,h3 { color:var(--blu); line-height:1.25; }
+    h1 { margin-top:0; font-size:34px; }
+    h2 { margin-top:0; border-bottom:1px solid var(--bordo); padding-bottom:8px; }
+    h3 { margin-bottom:6px; }
+    p { margin:8px 0 12px; }
+    ul,ol { padding-left:24px; }
+    li { margin:4px 0; }
+    table { width:100%; border-collapse:collapse; margin:12px 0; }
+    th,td { border:1px solid var(--bordo); padding:8px 10px; vertical-align:top; text-align:left; }
+    th { background:#eef3f8; color:#334155; }
+    code { background:#eef2f6; border-radius:4px; padding:1px 5px; }
+    .lead { font-size:18px; color:#3e4c59; }
+    .nota { border-left:4px solid var(--blu); background:#edf6ff; padding:12px 14px; margin:12px 0; }
+    .avviso { border-left-color:var(--rosso); background:#fff1f0; }
+    .autore { background:linear-gradient(135deg,#f0f7ff,#fff); }
+    .griglia { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
+    .scheda { border:1px solid var(--bordo); border-radius:8px; padding:14px; }
+    footer { color:var(--tenue); text-align:center; padding-bottom:30px; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Indice del manuale">
+      <strong>PM-Kanban</strong>
+      <a href="#introduzione">Introduzione</a>
+      <a href="#configurazione">Configurazione</a>
+      <a href="#progetti">Progetti</a>
+      <a href="#attivita">Attività</a>
+      <a href="#viste">Viste</a>
+      <a href="#dati">Dati e sicurezza</a>
+      <a href="#problemi">Problemi</a>
+      <a class="attivo" href="manuale.html">Italiano</a>
+      <a class="lingua" href="manuale-en.html">English</a>
+    </nav>
+  </header>
 
-      * { box-sizing: border-box; }
+  <main>
+    <section id="introduzione">
+      <h1>Manuale utente di PM-Kanban</h1>
+      <p class="lead">PM-Kanban è un'applicazione desktop per gestire progetti e attività da un'unica origine dati, osservabile come Kanban, Gantt, calendario, agenda, tabella e dashboard.</p>
+      <p>I dati restano in file JSON salvati in una cartella SharePoint sincronizzata con OneDrive. Il programma non richiede database, registrazione applicativa o licenze aggiuntive. Le notifiche Teams ed email possono essere inviate da un flusso Power Automate collegato ai dati del progetto.</p>
+      <div class="nota"><strong>Ricerca globale:</strong> il campo in alto filtra tutte le viste per codice, titolo, descrizione, responsabile, tag ed email.</div>
+    </section>
 
-      body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.6;
-      }
+    <section id="configurazione">
+      <h2>1. Primo avvio e configurazione</h2>
+      <ol>
+        <li>Nel sito SharePoint del team creare, nella raccolta Documenti, una cartella dedicata, ad esempio <code>PM-Kanban</code>.</li>
+        <li>Premere <strong>Sincronizza</strong> oppure <strong>Aggiungi collegamento a OneDrive</strong>, così la cartella compare in Esplora file.</li>
+        <li>Aprire PM-Kanban e accedere a <strong>Impostazioni</strong> con il pulsante ⚙️.</li>
+        <li>Inserire l'email aziendale valida e, facoltativamente, il proprio nome.</li>
+        <li>Premere <strong>Salva</strong>.</li>
+        <li>Con <strong>Scegli cartella…</strong> selezionare la cartella SharePoint sincronizzata.</li>
+      </ol>
+      <p>L'email identifica il proprietario dei progetti. Chi crea un progetto è il suo unico autore; gli altri utenti che lo aprono con un'email differente lo vedono in sola lettura. Per le nuove attività l'email configurata è proposta automaticamente come responsabile.</p>
+      <p>La pagina Impostazioni può anche eseguire immediatamente <strong>Controlla adesso</strong>: confronta le attività con il registro delle notifiche scritte da Power Automate. Il controllo automatico avviene ogni cinque minuti.</p>
+      <div class="nota">Le impostazioni locali (email, nome e cartella) sono salvate sul PC e non nel file del progetto.</div>
+    </section>
 
-      .topbar {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: var(--panel);
-        border-bottom: 1px solid var(--border);
-      }
+    <section id="progetti">
+      <h2>2. Gestione dei progetti</h2>
+      <p>Il menu <strong>Progetto</strong> e la lista accanto consentono di cambiare progetto e svolgere le operazioni principali.</p>
+      <div class="griglia">
+        <div class="scheda"><h3>Nuovo progetto</h3><p>Richiede nome e consente cliente, prefisso dei codici e tag. Se il prefisso è vuoto viene proposto dalla prima parola del nome. Ogni progetto viene salvato come file JSON.</p></div>
+        <div class="scheda"><h3>Apri progetto</h3><p><strong>Apri Progetto</strong> seleziona un file JSON anche esterno alla cartella configurata. Il file rimane nel percorso originale e le modifiche successive vengono salvate direttamente lì durante la sessione.</p></div>
+        <div class="scheda"><h3>Salva una copia</h3><p>Crea una copia aggiornata nel percorso scelto. Non sostituisce il file aperto e non cambia il percorso dei salvataggi successivi.</p></div>
+        <div class="scheda"><h3>Elimina progetto</h3><p>Disponibile solo al proprietario. Dopo una conferma elimina il file del progetto, le attività e tutti gli allegati associati.</p></div>
+      </div>
+      <p>La selezione del progetto e dell'ultima vista sono ricordate sul PC. L'app rileva modifiche provenienti da OneDrive o da altri computer e aggiorna elenco e dati.</p>
+    </section>
 
-      nav {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 1rem 1.25rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        align-items: center;
-      }
+    <section id="attivita">
+      <h2>3. Creare e gestire le attività</h2>
+      <p>Premere <strong>+ Nuova attività</strong> oppure usare <kbd>Ctrl+N</kbd>. Una card, una riga o un elemento degli altri calendari apre il dettaglio dell'attività.</p>
+      <table>
+        <thead><tr><th>Campo o comando</th><th>Funzionamento</th></tr></thead>
+        <tbody>
+          <tr><td>Codice</td><td>Facoltativo in inserimento: se vuoto viene generato automaticamente, per esempio <code>SARA-001</code>, in base al prefisso del progetto. È univoco.</td></tr>
+          <tr><td>Titolo, descrizione</td><td>Il titolo è obbligatorio; la descrizione è libera.</td></tr>
+          <tr><td>Stato</td><td>In preparazione, Da iniziare, In corso, Sospesa, Completata o Annullata.</td></tr>
+          <tr><td>Priorità</td><td>Bassa, Media, Alta o Critica.</td></tr>
+          <tr><td>Inizio e fine</td><td>Date e ore obbligatorie. La fine non può precedere l'inizio. Cambiando l'inizio, durata e anticipo della notifica vengono conservati quando possibile.</td></tr>
+          <tr><td>Responsabili</td><td>Almeno una email valida; è possibile inserire più indirizzi separati da punto e virgola. Tutti ricevono la notifica.</td></tr>
+          <tr><td>Partecipanti</td><td>Email facoltative, separate da punto e virgola o righe. Ricevono anch'esse la notifica.</td></tr>
+          <tr><td>Tag</td><td>Etichette separate da virgole, utili anche nella ricerca.</td></tr>
+          <tr><td>Avanzamento</td><td>Da 0 a 100% in passi di 5 nel modulo. Le attività completate devono risultare al 100%.</td></tr>
+          <tr><td>Notifica</td><td>Attiva, disattivata o già inviata. Per le attività future è attiva per impostazione predefinita, con invio previsto 15 minuti prima dell'inizio. Se l'orario proposto è passato, l'app propone il primo intervallo utile.</td></tr>
+          <tr><td>Canale</td><td>Teams, email oppure entrambi. L'eventuale flusso Power Automate effettua l'invio ai responsabili e partecipanti.</td></tr>
+          <tr><td>Collegamenti</td><td>URL con tipo SharePoint, Teams, Jira, DevOps, Planner o Altro. Il collegamento si apre nel browser predefinito.</td></tr>
+          <tr><td>Allegati</td><td>Dopo il primo salvataggio è possibile aggiungere più file, aprirli e rimuoverli. Sono copiati sotto la cartella dati dell'app.</td></tr>
+          <tr><td>Duplica ed elimina</td><td>Una copia crea una nuova attività; l'eliminazione rimuove anche allegati e dipendenze dopo conferma.</td></tr>
+        </tbody>
+      </table>
+      <p>Nella parte bassa del modulo sono mostrati data di creazione, ultima modifica e autore dell'ultima modifica. In sola lettura i campi restano visibili, ma non modificabili.</p>
+    </section>
 
-      nav a {
-        text-decoration: none;
-        color: var(--text);
-        padding: 0.55rem 0.9rem;
-        border-radius: 999px;
-        transition: 0.2s ease;
-        font-weight: 600;
-      }
+    <section id="viste">
+      <h2>4. Le sei viste operative</h2>
 
-      nav a:hover {
-        background: var(--accent);
-        color: var(--primary-dark);
-      }
+      <h3>Kanban</h3>
+      <ul>
+        <li>Una colonna per ogni stato, con contatore delle attività.</li>
+        <li>Trascinare una card fra colonne per cambiare stato.</li>
+        <li>La card mostra codice, priorità, titolo, responsabili, date, avanzamento, partecipanti e allegati.</li>
+        <li>Le attività scadute e non chiuse sono evidenziate da un bordo rosso lampeggiante.</li>
+        <li>Il pulsante 🔔/🔕 attiva o disattiva direttamente le notifiche; una notifica già inviata non può essere riattivata senza cambiare data o canale nel dettaglio.</li>
+      </ul>
 
-      .container {
-        max-width: 1100px;
-        margin: 2rem auto;
-        padding: 0 1.25rem 3rem;
-      }
+      <h3>Gantt</h3>
+      <ul>
+        <li>Mostra tutte le attività filtrate su una scala da Giorno a Anno, con fine settimana evidenziati e linea rossa "Oggi".</li>
+        <li>Trascinare il corpo di una barra per spostare l'attività; trascinare il bordo sinistro o destro per cambiare inizio o fine.</li>
+        <li>Il cambio è a scatti di un'ora nello zoom Giorno e di un giorno negli altri zoom.</li>
+        <li><strong>Oggi</strong> centra la linea corrente; i pulsanti zoom e il menu cambiano scala.</li>
+        <li>È possibile ridimensionare la colonna Attività trascinando il bordo destro dell'intestazione.</li>
+        <li><strong>Collega attività</strong> crea dipendenze FS (fine-inizio), SS (inizio-inizio), FF (fine-fine) o SF (inizio-fine): selezionare il predecessore, quindi il successore. <kbd>Esc</kbd> annulla.</li>
+        <li>La freccia mostra il tipo di collegamento; cliccandola in modalità modificabile e confermando la si può eliminare.</li>
+        <li>Il predecessore appare come padre e il successore come figlia rientrata sotto di esso.</li>
+        <li><strong>Esporta PNG</strong> salva l'intero Gantt, non solo la parte visibile, usando zoom e larghezza colonna correnti. Le immagini troppo grandi vengono ridotte.</li>
+      </ul>
 
-      .card {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(31, 79, 193, 0.04);
-        padding: 1.5rem 1.6rem;
-        margin-bottom: 1.25rem;
-      }
+      <h3>Calendario</h3>
+      <ul>
+        <li>Visualizzazione mese, settimana o giorno; navigazione precedente/successivo e ritorno a Oggi.</li>
+        <li>Le attività sono collocate in base alla data di inizio. Ogni stato può essere incluso o escluso con i filtri; all'apertura è selezionato soltanto Da iniziare.</li>
+        <li>Sabati, domeniche e festività italiane hanno sfondo rosso chiaro e, per le feste, il nome visibile.</li>
+        <li>Feste considerate: Capodanno, Epifania, Pasqua e Lunedì dell'Angelo, 25 aprile, 1 maggio, 2 giugno, Ferragosto, 4 ottobre dal 2026, Ognissanti, Immacolata, Natale e Santo Stefano.</li>
+        <li>Cliccare un giorno crea, se consentito, un'attività con inizio alle 9 e durata predefinita di un'ora.</li>
+      </ul>
 
-      h1, h2, h3 {
-        margin-top: 0;
-        color: var(--primary-dark);
-      }
+      <h3>Agenda</h3>
+      <p>Raggruppa le attività per data di inizio in Oggi, Domani e date successive. Permette di filtrare tutto, Da iniziare, In corso o le proprie attività. Le attività completate e annullate sono nascoste per impostazione predefinita, ma possono essere mostrate. I ritardi sono evidenziati.</p>
 
-      ul {
-        padding-left: 1.25rem;
-      }
+      <h3>Tabella</h3>
+      <p>Mostra codice, titolo, stato, priorità, responsabile, inizio, fine e avanzamento. Cliccare l'intestazione ordina in modo crescente o decrescente. <strong>Esporta in CSV</strong> salva le attività visualizzate e ordinate, con separatore punto e virgola, codifica UTF-8 e protezione dei valori che potrebbero essere interpretati come formule.</p>
 
-      .author-box {
-        background: linear-gradient(135deg, #f3f7ff, #eef5ff);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1.2rem;
-      }
+      <h3>Dashboard</h3>
+      <ul>
+        <li>Indicatori: totale, aperte, completate, in ritardo, in scadenza oggi, in scadenza questa settimana e avanzamento medio.</li>
+        <li>Grafici per stato, priorità delle attività aperte, primi dieci responsabili per carico e completamenti delle ultime otto settimane.</li>
+        <li>Elenchi cliccabili delle attività in ritardo e in scadenza oggi.</li>
+        <li>Tutti i valori rispettano il filtro di ricerca globale.</li>
+      </ul>
+    </section>
 
-      .badge {
-        display: inline-block;
-        background: var(--primary);
-        color: white;
-        font-weight: 700;
-        border-radius: 999px;
-        padding: 0.3rem 0.7rem;
-        font-size: 0.8rem;
-      }
+    <section id="dati">
+      <h2>5. Memorizzazione, sincronizzazione e controlli</h2>
+      <h3>Dove sono i dati</h3>
+      <ul>
+        <li>Ogni progetto è un file JSON nella cartella SharePoint sincronizzata.</li>
+        <li>Gli allegati si trovano in <code>allegati/&lt;idProgetto&gt;/&lt;idAttività&gt;/</code>.</li>
+        <li><code>_notifiche-inviate.json</code> è il registro scritto dal flusso Power Automate.</li>
+        <li>Le copie create con Salva una Copia possono essere aperte e gestite anche fuori dalla cartella predefinita.</li>
+      </ul>
+      <h3>Affidabilità dei salvataggi</h3>
+      <ul>
+        <li>Il file viene riletto dal disco prima di ogni modifica per ridurre il rischio di sovrascrivere il lavoro di un altro utente.</li>
+        <li>Ogni attività ha una versione: una modifica avvenuta nel frattempo genera un avviso di conflitto e i dati vengono ricaricati.</li>
+        <li>Il salvataggio usa un file temporaneo e la rinomina, con nuovi tentativi se OneDrive blocca momentaneamente il file.</li>
+        <li>La struttura dei file è validata a ogni lettura e prima di ogni salvataggio; codici duplicati, riferimenti non validi, date incoerenti e campi non previsti vengono segnalati.</li>
+        <li>Non sono ammessi auto-collegamenti, dipendenze duplicate o cicliche.</li>
+        <li>Le copie in conflitto prodotte da OneDrive vengono segnalate sopra l'area di lavoro.</li>
+        <li>Le date sono salvate in UTC e visualizzate nell'ora locale del PC.</li>
+        <li>La cronologia versioni di SharePoint può essere usata come ulteriore copia di sicurezza.</li>
+      </ul>
+      <div class="nota avviso"><strong>Sola lettura:</strong> modifiche, trascinamenti, eliminazioni e collegamenti sono disabilitati quando l'email configurata non coincide con il proprietario del progetto.</div>
+    </section>
 
-      code {
-        background: #f3f4f6;
-        border-radius: 8px;
-        padding: 0.15rem 0.4rem;
-      }
-    </style>
-  </head>
-  <body>
-    <header class="topbar">
-      <nav aria-label="Menu principale">
-        <a href="#home">Home</a>
-        <a href="#funzionalita">Funzionalità</a>
-        <a href="#autore">Autore</a>
-        <a href="#manuale">?</a>
-      </nav>
-    </header>
+    <section id="problemi">
+      <h2>6. Problemi comuni</h2>
+      <table>
+        <thead><tr><th>Messaggio o situazione</th><th>Soluzione</th></tr></thead>
+        <tbody>
+          <tr><td>Cartella non raggiungibile</td><td>Verificare che OneDrive sia avviato e che la cartella SharePoint sia ancora sincronizzata; poi selezionarla nuovamente in Impostazioni.</td></tr>
+          <tr><td>Progetto in sola lettura</td><td>L'email in Impostazioni deve coincidere con il proprietario salvato nel progetto.</td></tr>
+          <tr><td>Struttura non valida</td><td>Il file è stato modificato manualmente o è danneggiato. Leggere il campo indicato nell'errore oppure ripristinare una versione precedente da SharePoint.</td></tr>
+          <tr><td>Copia in conflitto</td><td>Confrontare i file indicati nell'avviso. L'app usa una copia; una volta scelti i dati corretti, eliminare le copie eccedenti dalla cartella.</td></tr>
+          <tr><td>Notifica non aggiornata</td><td>Controllare il flusso Power Automate e usare Controlla adesso. L'app non invia direttamente Teams o email.</td></tr>
+          <tr><td>Una seconda finestra non si apre</td><td>PM-Kanban consente una sola istanza alla volta per evitare salvataggi concorrenti; la finestra esistente viene portata in primo piano.</td></tr>
+          <tr><td>Manuale non si apre</td><td>Usare il pulsante ? per riaprirlo. Se il file manuale è stato spostato dalla cartella dell'app, reinstallare PM-Kanban.</td></tr>
+        </tbody>
+      </table>
+    </section>
 
-    <main class="container">
-      <section id="home" class="card">
-        <span class="badge">Manuale</span>
-        <h1>PM-Kanban</h1>
-        <p>
-          Questo manuale descrive le principali funzionalità dell'applicazione PM-Kanban,
-          con un focus su gestione progetti, attività, notifiche e flussi di lavoro.
-        </p>
-      </section>
-
-      <section id="funzionalita" class="card">
-        <h2>Funzionalità principali</h2>
-        <ul>
-          <li>Gestione di più progetti e clienti.</li>
-          <li>Creazione, modifica e eliminazione di attività.</li>
-          <li>Visualizzazione Kanban, Gantt, Calendario, Agenda e Dashboard.</li>
-          <li>Assegnazione di responsabile, partecipanti e tag.</li>
-          <li>Notifiche per data di inizio e avanzamento.</li>
-          <li>Collegamenti e allegati alle attività.</li>
-        </ul>
-      </section>
-
-      <section id="autore" class="card">
-        <h2>Autore</h2>
-        <div class="author-box">
-          <p><strong>Nome:</strong> Cogne</p>
-          <p><strong>Email:</strong> cogne@esempio.it</p>
-        </div>
-      </section>
-
-      <section id="manuale" class="card">
-        <h2>Sezione ? - Manuale HTML</h2>
-        <p>
-          Questa è la sezione dedicata al manuale HTML dell'applicazione. Può essere ampliata con
-          istruzioni specifiche per l'uso, esempi pratici e riferimenti alle procedure aziendali.
-        </p>
-
-        <h3>Istruzioni rapide</h3>
-        <ol>
-          <li>Selezionare un progetto dall'elenco oppure usare <strong>Apri JSON…</strong> per aprire un file progetto da un'altra cartella.</li>
-          <li>Creare un nuovo progetto dal menù principale.</li>
-          <li>Inserire le attività con titolo, data di inizio e responsabile.</li>
-          <li>Monitorare lo stato tramite le diverse viste.</li>
-          <li>Usare le dipendenze e le notifiche per coordinare i lavori.</li>
-        </ol>
-
-        <h3>Vista Gantt</h3>
-        <ul>
-          <li><strong>Barre:</strong> trascina una barra per spostare l'attività, trascina i bordi per cambiare inizio o fine. Dentro la barra è indicata la percentuale di avanzamento (nelle barre molto strette compare accanto alla barra).</li>
-          <li><strong>Oggi e zoom:</strong> <strong>📍 Oggi</strong> centra la linea rossa; i pulsanti zoom o il menù a tendina cambiano la scala da Giorno ad Anno.</li>
-          <li><strong>Collegare due attività:</strong> premi <strong>🔗 Collega attività</strong>, scegli il tipo di dipendenza, clicca l'attività di partenza e poi quella che ne dipende (si può cliccare sia la barra sia il nome nella colonna di sinistra). <strong>Esc</strong> annulla.</li>
-          <li><strong>Scollegare due attività:</strong> clicca sulla freccia che le unisce e conferma l'eliminazione.</li>
-          <li><strong>Padre e figlie:</strong> se due attività sono collegate, quella di partenza è il padre e quella di arrivo la figlia. La figlia compare sotto il padre, con codice e titolo rientrati e il simbolo ↳.</li>
-          <li><strong>Colonna delle attività:</strong> trascina il bordo destro dell'intestazione <em>Attività</em> per allargarla o restringerla.</li>
-          <li><strong>🖼 Esporta PNG:</strong> salva come immagine l'intero Gantt (non solo la parte visibile), con zoom e larghezza della colonna correnti. Le immagini molto grandi vengono ridotte.</li>
-        </ul>
-
-        <h3>File progetto in altre cartelle</h3>
-        <p>
-          <strong>Apri JSON…</strong> apre un progetto dalla posizione scelta e le modifiche successive vengono salvate
-          direttamente in quel file. <strong>Salva copia…</strong> crea una copia aggiornata nella cartella desiderata;
-          non cambia il file originale né la posizione dei salvataggi successivi.
-        </p>
-
-        <h3>Note utili</h3>
-        <p>
-          Gli ID delle attività sono numerici e sequenziali; i codici vengono generati automaticamente
-          in base al prefisso del progetto, ad esempio <code>SARA-001</code>.
-        </p>
-      </section>
-    </main>
-  </body>
+    <section id="autore" class="autore">
+      <h2>Autore e contatti</h2>
+      <p><strong>Autore:</strong> Alessandro Puglisi</p>
+      <p><strong>E-mail:</strong> <a href="mailto:ing.puglisi@gmail.com">ing.puglisi@gmail.com</a></p>
+      <p>Versione lingua: <a href="manuale.html">Italiano</a> · <a href="manuale-en.html">English</a></p>
+    </section>
+  </main>
+  <footer>PM-Kanban — Manuale utente</footer>
+</body>
 </html>

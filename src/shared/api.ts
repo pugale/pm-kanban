@@ -32,6 +32,8 @@ export interface PmApi {
   esportaCsv(contenuto: string): Promise<Risultato<string | null>>;
   /** Salva un'immagine PNG (contenuto in base64) scegliendo il file con una finestra di dialogo */
   esportaPng(base64: string, nomePredefinito: string): Promise<Risultato<string | null>>;
+  /** Apre il manuale HTML dell'applicazione nel browser predefinito */
+  apriManuale(): Promise<Risultato<void>>;
 
   // Attività
   attivita(progettoId: string): Promise<Risultato<DatiProgetto>>;
